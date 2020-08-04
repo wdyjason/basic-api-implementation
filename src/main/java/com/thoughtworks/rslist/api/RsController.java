@@ -45,6 +45,10 @@ public class RsController {
     }
   }
 
+  @DeleteMapping("rs/item/{id}")
+  public void deleteOneById(@PathVariable int id) {
+    rsList.remove(rsList.get(id - 1));
+  }
 
   public void isNull(Object object, String msg) {
     if (object == null) {
