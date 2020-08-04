@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,10 +28,33 @@ public class RsController {
   public void addOne(@RequestBody String newEventStr) throws JsonProcessingException {
     ObjectMapper objectMapper = new ObjectMapper();
     RsEvent newEvent = objectMapper.readValue(newEventStr, RsEvent.class);
-    if (newEvent == null) {
-      throw new RuntimeException("RequestBody is illegal !");
-    }
+    isNull(newEvent, "requestBody is null");
     rsList.add(newEvent);
+  }
+
+  @PutMapping("rs/item/{id}")
+  public void replaceOneById(@PathVariable int id, @RequestBody RsEvent rsEvent) {
+    isNull(rsEvent, "requestBody is null");
+    String newEventName = rsEvent.getEventName();
+    String newKeyWord = rsEvent.getKeyWord();
+    if (strIsBlank(newEventName)) {
+      rsList.get(id - 1).setEventName(newEventName);
+    }
+    if (strIsBlank(newKeyWord)) {
+      rsList.get(id - 1).setKeyWord(newKeyWord);
+    }
+  }
+
+
+  public void isNull(Object object, String msg) {
+    if (object == null) {
+      throw new RuntimeException(msg);
+    }
+  }
+
+  public boolean strIsBlank(String str) {
+    if (str == null) return false;
+    return !str.isEmpty();
   }
 
 }

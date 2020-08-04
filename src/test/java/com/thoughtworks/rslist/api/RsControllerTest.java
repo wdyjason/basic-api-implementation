@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import org.junit.jupiter.api.Test;
@@ -10,10 +11,9 @@ import org.springframework.data.web.JsonPath;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -66,4 +66,25 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[3].keyWord").value("军事"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    public void should_replace_one_by_id_successful() throws Exception {
+        RsEvent putEvent = new RsEvent("修改的事件", "未分类");
+        ObjectMapper objectMapper = new ObjectMapper();
+        String putEventStr = objectMapper.writeValueAsString(putEvent);
+        mockMvc.perform(put("/rs/item/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(putEventStr))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/rs/list"))
+                .andExpect(jsonPath("$[0].eventName").value("修改的事件"))
+                .andExpect(jsonPath("$[0].keyWord").value("未分类"))
+                .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
+                .andExpect(jsonPath("$[1].keyWord").value("文化"))
+                .andExpect(jsonPath("$[2].eventName").value("第三条事件"))
+                .andExpect(jsonPath("$[2].keyWord").value("政治"))
+                .andExpect(status().isOk());
+    }
+
 }
