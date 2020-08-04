@@ -30,4 +30,14 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[2].keyWord").value("政治"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    public void should_get_limit_rs_list_when_request_get_with_parameters() throws Exception {
+        mockMvc.perform(get("/rs/list?startIndex=2&endIndex=3"))
+                .andExpect(jsonPath("$[0].eventName").value("第二条事件"))
+                .andExpect(jsonPath("$[0].keyWord").value("文化"))
+                .andExpect(jsonPath("$[1].eventName").value("第三条事件"))
+                .andExpect(jsonPath("$[1].keyWord").value("政治"))
+                .andExpect(status().isOk());
+    }
 }
