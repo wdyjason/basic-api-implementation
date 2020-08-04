@@ -29,22 +29,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 class RsControllerTest {
 
-    @Autowired
-    public RsController rsController;
-
-    private List<RsEvent> rsList = Stream.of(new RsEvent("第一条事件", "经济"),
-            new RsEvent("第二条事件", "文化"), new RsEvent("第三条事件", "政治"))
-            .collect(Collectors.toList());
-
     MockMvc mockMvc;
 
     @BeforeEach
-    public void setUp() throws NoSuchFieldException, IllegalAccessException {
-        Field rsListField = rsController.getClass().getDeclaredField("rsList");
-        rsListField.setAccessible(true);
-        rsListField.set(rsController, rsList);
-        rsListField.setAccessible(false);
-        mockMvc = MockMvcBuilders.standaloneSetup(rsController).build();
+    public void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(new RsController()).build();
     }
 
     @Test

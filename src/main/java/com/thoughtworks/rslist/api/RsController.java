@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.thoughtworks.rslist.utils.Utils.isNull;
+import static com.thoughtworks.rslist.utils.Utils.strIsBlank;
+
 @RestController
 public class RsController {
   private List<RsEvent> rsList = Stream.of(new RsEvent("第一条事件", "经济"),
@@ -48,17 +51,6 @@ public class RsController {
   @DeleteMapping("rs/item/{id}")
   public void deleteOneById(@PathVariable int id) {
     rsList.remove(rsList.get(id - 1));
-  }
-
-  public void isNull(Object object, String msg) {
-    if (object == null) {
-      throw new RuntimeException(msg);
-    }
-  }
-
-  public boolean strIsBlank(String str) {
-    if (str == null) return false;
-    return !str.isEmpty();
   }
 
 }
