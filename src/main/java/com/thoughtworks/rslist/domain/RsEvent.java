@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.domain;
 
+import com.thoughtworks.rslist.validation.FirstValidation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,13 +14,13 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class RsEvent {
 
-    @NotNull
+    @NotNull(groups = FirstValidation.class)
     private String eventName;
 
-    @NotNull
+    @NotNull(groups = FirstValidation.class)
     private String keyWord;
 
-    @NotNull
+    @NotNull(groups = FirstValidation.class)
     @Valid
     private User user;
 

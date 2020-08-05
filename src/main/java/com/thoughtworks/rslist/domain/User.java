@@ -1,5 +1,7 @@
 package com.thoughtworks.rslist.domain;
 
+import com.thoughtworks.rslist.validation.FirstValidation;
+import com.thoughtworks.rslist.validation.SecondValidation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,22 +13,22 @@ import javax.validation.constraints.*;
 @AllArgsConstructor
 public class User {
 
-    @Size(max = 8)
-    @NotNull
+    @Size(max = 8, groups = SecondValidation.class)
+    @NotNull(groups = FirstValidation.class)
     private String userName;
 
-    @Min(18)
-    @Max(100)
-    @NotNull
+    @Min(value = 18, groups = SecondValidation.class)
+    @Max(value = 100, groups = SecondValidation.class)
+    @NotNull(groups = FirstValidation.class)
     private Integer age;
 
-    @NotNull
+    @NotNull(groups = FirstValidation.class)
     private String gender;
 
-    @Email
+    @Email(groups = FirstValidation.class)
     private String email;
 
-    @NotNull
-    @Pattern(regexp = "1\\d{10}")
+    @NotNull(groups = FirstValidation.class)
+    @Pattern(regexp = "1\\d{10}", groups = SecondValidation.class)
     private String phone;
 }
