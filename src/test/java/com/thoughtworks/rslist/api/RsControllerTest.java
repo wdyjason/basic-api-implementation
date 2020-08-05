@@ -21,9 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.is;
-
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -51,13 +49,13 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
                 .andExpect(jsonPath("$[0].keyWord").value("经济"))
-                .andExpect(jsonPath("$[0]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
                 .andExpect(jsonPath("$[1].keyWord").value("文化"))
-                .andExpect(jsonPath("$[1]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[2].eventName").value("第三条事件"))
                 .andExpect(jsonPath("$[2].keyWord").value("政治"))
-                .andExpect(jsonPath("$[2]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[2]", not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
 
@@ -66,18 +64,19 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/list?startIndex=2&endIndex=3"))
                 .andExpect(jsonPath("$[0].eventName").value("第二条事件"))
                 .andExpect(jsonPath("$[0].keyWord").value("文化"))
-                .andExpect(jsonPath("$[0]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName").value("第三条事件"))
                 .andExpect(jsonPath("$[1].keyWord").value("政治"))
-                .andExpect(jsonPath("$[1]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void should_add_item_successful_when_receive_post_request() throws Exception {
-        RsEvent postEvent = new RsEvent("第四条事件", "军事", oldUser);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String postEventStr = objectMapper.writeValueAsString(postEvent);
+//        RsEvent postEvent = new RsEvent("第四条事件", "军事", oldUser);
+//        ObjectMapper objectMapper = new ObjectMapper();
+        String postEventStr = "{\"eventName\":\"第四条事件\",\"keyWord\":\"军事\"," +
+                "\"user\":{\"userName\":\"oldUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
         System.out.println(postEventStr);
         mockMvc.perform(post("/rs/item")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -88,16 +87,16 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
                 .andExpect(jsonPath("$[0].keyWord").value("经济"))
-                .andExpect(jsonPath("$[0]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
                 .andExpect(jsonPath("$[1].keyWord").value("文化"))
-                .andExpect(jsonPath("$[1]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[2].eventName").value("第三条事件"))
                 .andExpect(jsonPath("$[2].keyWord").value("政治"))
-                .andExpect(jsonPath("$[2]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[2]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[3].eventName").value("第四条事件"))
                 .andExpect(jsonPath("$[3].keyWord").value("军事"))
-                .andExpect(jsonPath("$[3]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[3]", not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
 
@@ -114,13 +113,13 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$[0].eventName").value("修改的事件"))
                 .andExpect(jsonPath("$[0].keyWord").value("未分类"))
-                .andExpect(jsonPath("$[0]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
                 .andExpect(jsonPath("$[1].keyWord").value("文化"))
-                .andExpect(jsonPath("$[1]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[2].eventName").value("第三条事件"))
                 .andExpect(jsonPath("$[2].keyWord").value("政治"))
-                .andExpect(jsonPath("$[2]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[2]", not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
 
@@ -131,10 +130,10 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$[0].eventName").value("第二条事件"))
                 .andExpect(jsonPath("$[0].keyWord").value("文化"))
-                .andExpect(jsonPath("$[0]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName").value("第三条事件"))
                 .andExpect(jsonPath("$[1].keyWord").value("政治"))
-                .andExpect(jsonPath("$[1]", is(hasKey("user"))))
+                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
 
@@ -143,27 +142,28 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/2"))
                 .andExpect(jsonPath("$.eventName").value("第二条事件"))
                 .andExpect(jsonPath("$.keyWord").value("文化"))
-                .andExpect(jsonPath("$", is(hasKey("user"))))
+                .andExpect(jsonPath("$", not(hasKey("user"))))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void should_add_user_successful_when_post_new_user() throws Exception {
-        User newUser =
-                new User("newUser", 20, "male", "a@qq.com", "18888888888");
-        RsEvent postEvent = new RsEvent("修改的事件", "未分类", newUser);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String eventStr = objectMapper.writeValueAsString(postEvent);
+//        User newUser =
+//                new User("newUser", 20, "male", "a@qq.com", "18888888888");
+//        RsEvent postEvent = new RsEvent("修改的事件", "未分类", newUser);
+//        ObjectMapper objectMapper = new ObjectMapper();
+        String eventStr = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
+                "\"user\":{\"userName\":\"newUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
         mockMvc.perform(post("/rs/item").content(eventStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("index: 2"))
                 .andExpect(status().isCreated());
-        assertEquals(newUser.toString(), UserController.userList.get(1).toString());
+//        assertEquals(newUser.toString(), UserController.userList.get(1).toString());
     }
 
     @Test
     public void user_name_max_size_is_8_when_post_event() throws Exception {
         String oldUserNameMoreThan8 = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
-                "\"user\":{\"userName\":\"oldUserHhh\",\"age\":2 0,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
+                "\"user\":{\"userName\":\"oldUserHhh\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
         mockMvc.perform(post("/rs/item").content(oldUserNameMoreThan8).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
