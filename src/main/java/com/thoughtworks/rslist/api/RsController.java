@@ -46,7 +46,7 @@ public class RsController {
     } else {
       userList.add(newEvent.getUser());
     }
-    return new ResponseEntity(HttpStatus.OK);
+    return new ResponseEntity("index: " + (rsList.size() - 1),HttpStatus.CREATED);
   }
 
   @PutMapping("rs/item/{id}")
