@@ -111,4 +111,12 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[1].keyWord").value("政治"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    public void should_get_one_by_id_successful() throws Exception {
+        mockMvc.perform(get("/rs/2"))
+                .andExpect(jsonPath("$.eventName").value("第二条事件"))
+                .andExpect(jsonPath("$.keyWord").value("文化"))
+                .andExpect(status().isOk());
+    }
 }

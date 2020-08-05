@@ -53,4 +53,8 @@ public class RsController {
     rsList.remove(rsList.get(id - 1));
   }
 
+  @GetMapping("rs/{id}")
+  public RsEvent getOneById(@PathVariable int id) {
+    return rsList.get(id - 1);
+  }
 }
