@@ -46,4 +46,16 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void  user_age_should_between_18_and_100() throws Exception {
+        String oldUserAge101 =
+                "{\"userName\":\"oldUser\",\"age\":101,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
+        mockMvc.perform(post("/user").content(oldUserAge101).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        String oldUserAge17 =
+                "{\"userName\":\"oldUser\",\"age\":17,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
+        mockMvc.perform(post("/user").content(oldUserAge17).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }
