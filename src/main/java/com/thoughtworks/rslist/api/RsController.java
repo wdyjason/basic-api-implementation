@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.validation.ValidationGroup;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,7 +37,7 @@ public class RsController {
   }
 
   @PostMapping("rs/item")
-  public void addOne(@RequestBody @Valid RsEvent newEvent) {
+  public void addOne(@RequestBody @Validated(ValidationGroup.class) RsEvent newEvent) {
     isNull(newEvent, "requestBody is null");
     if (containSameUserInList(newEvent.getUser())) {
       rsList.add(newEvent);
