@@ -75,5 +75,13 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void user_phone_should_correct() throws Exception {
+        String oldUserPhoneWrong =
+                "{\"userName\":\"oldUser\",\"age\":2 0,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888\"}";
+        mockMvc.perform(post("/user").content(oldUserPhoneWrong).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }
