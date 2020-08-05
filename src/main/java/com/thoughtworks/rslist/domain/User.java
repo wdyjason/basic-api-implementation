@@ -23,6 +23,7 @@ public class User {
     @NotNull
     private String gender;
 
+    @Email
     private String email;
 
     private String phone;
