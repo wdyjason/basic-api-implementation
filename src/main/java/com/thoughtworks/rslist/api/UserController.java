@@ -20,7 +20,7 @@ public class UserController {
     @PostMapping("/user")
     public ResponseEntity registerUser(@RequestBody @Validated(ValidationGroup.class) User user) {
         userList.add(user);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity("index: " + (userList.size() - 0), HttpStatus.CREATED);
     }
 
 }
