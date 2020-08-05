@@ -11,6 +11,7 @@ import javax.validation.constraints.*;
 @AllArgsConstructor
 public class User {
 
+    @Size(max = 8)
      private String userName;
 
     private Integer age;
