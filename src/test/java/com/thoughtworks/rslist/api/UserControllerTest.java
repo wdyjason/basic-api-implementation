@@ -41,7 +41,7 @@ class UserControllerTest {
     @Test
     public void user_name_max_size_is_8() throws Exception {
         String oldUserNameMoreThan8 =
-                "{\"userName\":\"oldUserHhh\",\"age\":2 0,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
+                "{\"userName\":\"oldUserHhh\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
         mockMvc.perform(post("/user").content(oldUserNameMoreThan8).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }

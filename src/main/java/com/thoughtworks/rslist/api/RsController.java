@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.validation.ValidationGroup;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,26 +30,27 @@ public class RsController {
           .collect(Collectors.toList());
 
   @GetMapping("rs/list")
-  public List<RsEvent> getAllInList(@RequestParam(required = false) Integer startIndex,
-                                    @RequestParam(required = false) Integer endIndex) {
+  public ResponseEntity getAllInList(@RequestParam(required = false) Integer startIndex,
+                                     @RequestParam(required = false) Integer endIndex) {
     if (startIndex == null || endIndex == null) {
-      return rsList;
+      return new ResponseEntity(rsList, HttpStatus.OK);
     }
-    return rsList.subList(startIndex - 1, endIndex);
+    return new ResponseEntity(rsList.subList(startIndex - 1, endIndex), HttpStatus.OK);
   }
 
   @PostMapping("rs/item")
-  public void addOne(@RequestBody @Validated(ValidationGroup.class) RsEvent newEvent) {
+  public ResponseEntity addOne(@RequestBody @Validated(ValidationGroup.class) RsEvent newEvent) {
     isNull(newEvent, "requestBody is null");
     if (containSameUserInList(newEvent.getUser())) {
       rsList.add(newEvent);
     } else {
       userList.add(newEvent.getUser());
     }
+    return new ResponseEntity(HttpStatus.OK);
   }
 
   @PutMapping("rs/item/{id}")
-  public void replaceOneById(@PathVariable int id, @RequestBody RsEvent rsEvent) {
+  public ResponseEntity replaceOneById(@PathVariable int id, @RequestBody RsEvent rsEvent) {
     isNull(rsEvent, "requestBody is null");
     String newEventName = rsEvent.getEventName();
     String newKeyWord = rsEvent.getKeyWord();
@@ -57,16 +60,18 @@ public class RsController {
     if (strIsBlank(newKeyWord)) {
       rsList.get(id - 1).setKeyWord(newKeyWord);
     }
+    return new ResponseEntity(HttpStatus.OK);
   }
 
   @DeleteMapping("rs/item/{id}")
-  public void deleteOneById(@PathVariable int id) {
+  public ResponseEntity deleteOneById(@PathVariable int id) {
     rsList.remove(rsList.get(id - 1));
+    return new ResponseEntity(HttpStatus.OK);
   }
 
   @GetMapping("rs/{id}")
-  public RsEvent getOneById(@PathVariable int id) {
-    return rsList.get(id - 1);
+  public ResponseEntity getOneById(@PathVariable int id) {
+    return new ResponseEntity(rsList.get(id - 1), HttpStatus.OK);
   }
 
   public boolean containSameUserInList(User addUser) {
