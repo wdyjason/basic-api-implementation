@@ -62,8 +62,18 @@ class UserControllerTest {
     @Test
     public void user_gender_is_not_null() throws Exception {
         String oldUserGenderNull =
-                "{\"userName\":\"oldUserHhh\",\"age\":2 0,\"gender\":\"null\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
+                "{\"userName\":\"oldUser\",\"age\":2 0,\"gender\":\"null\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
         mockMvc.perform(post("/user").content(oldUserGenderNull).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void user_email_should_correct() throws Exception {
+        String oldUserEmailWrong =
+                "{\"userName\":\"oldUser\",\"age\":2 0,\"gender\":\"male\",\"email\":\"aqq.com\",\"phone\":\"18888888888\"}";
+        mockMvc.perform(post("/user").content(oldUserEmailWrong).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
 }
