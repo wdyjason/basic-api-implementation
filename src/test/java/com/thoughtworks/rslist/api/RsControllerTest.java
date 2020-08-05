@@ -82,7 +82,8 @@ class RsControllerTest {
         mockMvc.perform(post("/rs/item")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(postEventStr))
-                .andExpect(status().isOk());
+                .andExpect(content().string("index: 3"))
+                .andExpect(status().isCreated());
 
         mockMvc.perform(get("/rs/list"))
                 .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
@@ -154,7 +155,8 @@ class RsControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String eventStr = objectMapper.writeValueAsString(postEvent);
         mockMvc.perform(post("/rs/item").content(eventStr).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(content().string("index: 2"))
+                .andExpect(status().isCreated());
         assertEquals(newUser.toString(), UserController.userList.get(1).toString());
     }
 
