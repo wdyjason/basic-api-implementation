@@ -166,4 +166,17 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void  user_age_should_between_18_and_100_when_post_event() throws Exception {
+        String oldUserAge101 = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
+                "\"user\":{\"userName\":\"oldUser\",\"age\":101,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
+        mockMvc.perform(post("/rs/item").content(oldUserAge101).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        String oldUserAge17 = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
+                "\"user\":{\"userName\":\"oldUser\",\"age\":17,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
+        mockMvc.perform(post("/rs/item").content(oldUserAge17).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }
