@@ -12,8 +12,12 @@ import javax.validation.constraints.*;
 public class User {
 
     @Size(max = 8)
-     private String userName;
+    @NotNull
+    private String userName;
 
+    @Min(18)
+    @Max(100)
+    @NotNull
     private Integer age;
 
     private String gender;
