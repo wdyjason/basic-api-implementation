@@ -157,4 +157,13 @@ class RsControllerTest {
                 .andExpect(status().isOk());
         assertEquals(newUser.toString(), UserController.userList.get(1).toString());
     }
+
+    @Test
+    public void user_name_max_size_is_8_when_post_event() throws Exception {
+        String oldUserNameMoreThan8 = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
+                "\"user\":{\"userName\":\"oldUserHhh\",\"age\":2 0,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
+        mockMvc.perform(post("/rs/item").content(oldUserNameMoreThan8).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }
