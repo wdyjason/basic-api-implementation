@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.validation.FirstValidation;
 import com.thoughtworks.rslist.validation.ValidationGroup;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
