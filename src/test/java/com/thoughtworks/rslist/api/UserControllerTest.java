@@ -41,7 +41,7 @@ class UserControllerTest {
     @Test
     public void user_name_max_size_is_8() throws Exception {
         String oldUserNameMoreThan8 =
-                "{\"userName\":\"oldUserHhh\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
+                "{\"userName\":\"oldUserHhh\",\"age\":2 0,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
         mockMvc.perform(post("/user").content(oldUserNameMoreThan8).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -56,6 +56,14 @@ class UserControllerTest {
         String oldUserAge17 =
                 "{\"userName\":\"oldUser\",\"age\":17,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
         mockMvc.perform(post("/user").content(oldUserAge17).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void user_gender_is_not_null() throws Exception {
+        String oldUserGenderNull =
+                "{\"userName\":\"oldUserHhh\",\"age\":2 0,\"gender\":\"null\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
+        mockMvc.perform(post("/user").content(oldUserGenderNull).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 }

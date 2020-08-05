@@ -20,6 +20,7 @@ public class User {
     @NotNull
     private Integer age;
 
+    @NotNull
     private String gender;
 
     private String email;
