@@ -11,6 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -81,6 +85,20 @@ class UserControllerTest {
                 "{\"userName\":\"oldUser\",\"age\":2 0,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888\"}";
         mockMvc.perform(post("/user").content(oldUserPhoneWrong).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void should_get_all_users() throws Exception {
+        UserController.userList =
+                Stream.of(new User("oldUser", 20, "male", "a@qq.com", "18888888888"))
+                        .collect(Collectors.toList());
+        mockMvc.perform(get("/users"))
+                .andExpect(jsonPath("$[0].user_name", is("oldUser")))
+                .andExpect(jsonPath("$[0].user_age", is(20)))
+                .andExpect(jsonPath("$[0].user_gender", is("male")))
+                .andExpect(jsonPath("$[0].user_email", is("a@qq.com")))
+                .andExpect(jsonPath("$[0].user_phone", is("18888888888")))
+                .andExpect(status().isOk());
     }
 
 
