@@ -195,4 +195,12 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void user_phone_should_correct_when_post_event() throws Exception {
+        String oldUserPhoneWrong = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
+                "\"user\":{\"userName\":\"oldUser\",\"age\":2 0,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888\"}";
+        mockMvc.perform(post("/rs/item").content(oldUserPhoneWrong).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }
