@@ -40,7 +40,7 @@ public class RsController {
     if (containSameUserInList(newEvent.getUser())) {
       rsList.add(newEvent);
     } else {
-      UserController.userList.add(newEvent.getUser());
+      userList.add(newEvent.getUser());
     }
   }
 
