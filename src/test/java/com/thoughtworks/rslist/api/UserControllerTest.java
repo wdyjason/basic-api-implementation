@@ -21,8 +21,7 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -39,10 +38,6 @@ class UserControllerTest {
     @BeforeEach
     public void setUp() {
         UserController.userList.clear();
-    }
-
-    @AfterEach
-    public void destroy() {
         userRepository.deleteAll();
     }
 
@@ -138,13 +133,26 @@ class UserControllerTest {
                 .andExpect(content().string("index: 0"))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/user/1").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/user/2").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_name", is("oldUser")))
                 .andExpect(jsonPath("$.user_age",  is(20)))
                 .andExpect(jsonPath("$.user_gender",  is("male")))
                 .andExpect(jsonPath("$.user_email",  is("a@qq.com")))
                 .andExpect(jsonPath("$.user_phone",  is("18888888888")))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void should_delete_one_by_id_successful() throws Exception {
+        mockMvc.perform(post("/user").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string("index: 0"))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(delete("/user/1").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        List<UserEntity> userEntities = userRepository.findAll();
+        assertEquals(0, userEntities.size());
     }
 
 }
