@@ -212,4 +212,11 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void should_throw_invalid_index_when_index_pout_of_bounds() throws Exception {
+        mockMvc.perform(get("/rs/5"))
+                .andExpect(content().string("{\"error\":\"invalid index\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
 }

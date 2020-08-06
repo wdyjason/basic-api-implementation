@@ -69,7 +69,10 @@ public class RsController {
   }
 
   @GetMapping("rs/{id}")
-  public ResponseEntity getOneById(@PathVariable int id) {
+  public ResponseEntity getOneById(@PathVariable int id) throws OutOfIndexException {
+    if (id < 0 || id >= rsList.size()) {
+      throw new OutOfIndexException("invalid index");
+    }
     return new ResponseEntity(rsList.get(id - 1), HttpStatus.OK);
   }
 
