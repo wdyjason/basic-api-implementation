@@ -35,10 +35,10 @@ import static com.thoughtworks.rslist.utils.Utils.*;
 @Slf4j
 @RestController
 public class RsController {
-  private  User oldUser =
+  private static User oldUser =
           new User("oldUser", 20, "male", "a@qq.com", "18888888888");
 
-  public  List<RsEvent> rsList = Stream.of(new RsEvent("第一条事件", "经济", oldUser),
+  public static List<RsEvent> rsList = Stream.of(new RsEvent("第一条事件", "经济", oldUser),
           new RsEvent("第二条事件", "文化", oldUser),
           new RsEvent("第三条事件", "政治", oldUser))
           .collect(Collectors.toList());
@@ -57,6 +57,14 @@ public class RsController {
       throw new OutOfIndexException("invalid request param");
     }
     return ResponseEntity.status(HttpStatus.OK).body(rsList.subList(startIndex - 1, endIndex));
+  }
+
+  @GetMapping("rs/{id}")
+  public ResponseEntity getOneById(@PathVariable int id) throws OutOfIndexException {
+    if (id < 0 || id >= rsList.size()) {
+      throw new OutOfIndexException("invalid index");
+    }
+    return ResponseEntity.status(HttpStatus.OK).body(rsList.get(id - 1));
   }
 
   @PostMapping("rs/item")
@@ -90,26 +98,18 @@ public class RsController {
     return ResponseEntity.status(HttpStatus.OK).body(null);
   }
 
-  @GetMapping("rs/{id}")
-  public ResponseEntity getOneById(@PathVariable int id) throws OutOfIndexException {
-    if (id < 0 || id >= rsList.size()) {
-      throw new OutOfIndexException("invalid index");
-    }
-    return ResponseEntity.status(HttpStatus.OK).body(rsList.get(id - 1));
-  }
-
   @Transactional
   @PatchMapping("rs/{rsEventId}")
-  public ResponseEntity patchOneEvent(@PathVariable(name = "rsEventId") @NotNull int eventId,
+  public ResponseEntity patchOneEvent(@PathVariable @NotNull int rsEventId,
                             @RequestBody @Validated({PatchForRsEventValidation.class}) RsEventEntity rsEvent) {
-    Optional<RsEventEntity> rsEventWarp = rsEventRepository.findById(eventId);
+    Optional<RsEventEntity> rsEventWarp = rsEventRepository.findById(rsEventId);
     if (rsEventWarp.isPresent() && rsEventWarp.get().getUserId() == rsEvent.getUserId()) {
 
       if (rsEvent.getEventName() != null)
-        rsEventRepository.updateEventNameById(eventId, rsEvent.getEventName());
+        rsEventRepository.updateEventNameById(rsEventId, rsEvent.getEventName());
 
       if (rsEvent.getKeyWord() != null)
-        rsEventRepository.updateKeyWordById(eventId, rsEvent.getKeyWord());
+        rsEventRepository.updateKeyWordById(rsEventId, rsEvent.getKeyWord());
 
       return ResponseEntity.status(HttpStatus.OK).build();
     }

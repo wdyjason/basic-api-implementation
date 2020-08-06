@@ -66,14 +66,17 @@ class RsControllerTest {
                 .email("a@qq.com")
                 .phone("18888888888")
                 .build());
-
-        RsController rsController = applicationContext.getBean(RsController.class);
-        Field rsList = rsController.getClass().getField("rsList");
-        rsList.set(rsController, Stream.of(new RsEvent("第一条事件", "经济", oldUser),
+//
+//        RsController rsController = applicationContext.getBean(RsController.class);
+//        Field rsList = rsController.getClass().getField("rsList");
+//        rsList.set(rsController, Stream.of(new RsEvent("第一条事件", "经济", oldUser),
+//                new RsEvent("第二条事件", "文化", oldUser),
+//                new RsEvent("第三条事件", "政治", oldUser))
+//                .collect(Collectors.toList()));
+        RsController.rsList = Stream.of(new RsEvent("第一条事件", "经济", oldUser),
                 new RsEvent("第二条事件", "文化", oldUser),
                 new RsEvent("第三条事件", "政治", oldUser))
-                .collect(Collectors.toList()));
-
+                .collect(Collectors.toList());
         UserController.userList = Stream.of(oldUser).collect(Collectors.toList());
     }
 
@@ -114,7 +117,7 @@ class RsControllerTest {
                 .andExpect(status().isCreated());
 
         List<RsEventEntity> rsEventEntities = rsEventRepository.findAll();
-        assertEquals(1, rsEventEntities.size());
+        assertEquals(2, rsEventEntities.size());
     }
 
     @Test
@@ -187,13 +190,13 @@ class RsControllerTest {
 ////        assertEquals(newUser.toString(), UserController.userList.get(1).toString());
 //    }
 
-    @Test
-    public void user_name_max_size_is_8_when_post_event() throws Exception {
-        String oldUserNameMoreThan8 = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
-                "\"user\":{\"userName\":\"oldUserHhh\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
-        mockMvc.perform(post("/rs/item").content(oldUserNameMoreThan8).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
+//    @Test
+//    public void user_name_max_size_is_8_when_post_event() throws Exception {
+//        String oldUserNameMoreThan8 = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
+//                "\"user\":{\"userName\":\"oldUserHhh\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
+//        mockMvc.perform(post("/rs/item").content(oldUserNameMoreThan8).contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isBadRequest());
+//    }
 
     @Test
     public void  user_age_should_between_18_and_100_when_post_event() throws Exception {
@@ -271,6 +274,20 @@ class RsControllerTest {
         List<RsEventEntity> rsEventEntityList = rsEventRepository.findAll();
         assertEquals("event", rsEventEntityList.get(0).getEventName());
         assertEquals("未分类", rsEventEntityList.get(0).getKeyWord());
+    }
+
+    @Test
+    public void should_bad_request_when_patch_userId_not_match_event_id() throws Exception {
+        rsEventRepository.save(RsEventEntity.builder()
+                .id(1)
+                .eventName("event")
+                .keyWord("keyW")
+                .userId(1)
+                .build());
+        String eventNameNullStr = "{\"eventName\":null,\"keyWord\":\"未分类\"," +
+                "\"userId\":3}";
+        mockMvc.perform(patch("/rs/2").content(eventNameNullStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
 
