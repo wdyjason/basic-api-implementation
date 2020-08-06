@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.web.JsonPath;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -18,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -129,6 +130,21 @@ class UserControllerTest {
                 .andExpect(status().isCreated());
         List<UserEntity> userEntities = userRepository.findAll();
         assertEquals(1, userEntities.size());
+    }
+
+    @Test
+    public void should_get_one_successful() throws Exception {
+        mockMvc.perform(post("/user").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string("index: 0"))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/user/1").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.user_name", is("oldUser")))
+                .andExpect(jsonPath("$.user_age",  is(20)))
+                .andExpect(jsonPath("$.user_gender",  is("male")))
+                .andExpect(jsonPath("$.user_email",  is("a@qq.com")))
+                .andExpect(jsonPath("$.user_phone",  is("18888888888")))
+                .andExpect(status().isOk());
     }
 
 }
