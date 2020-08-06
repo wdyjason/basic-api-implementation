@@ -2,9 +2,12 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.exception.GlobalExceptionHandler;
 import com.thoughtworks.rslist.validation.ValidationGroup;
 import com.thoughtworks.rslist.exception.CommonError;
 import com.thoughtworks.rslist.exception.OutOfIndexException;
+import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.XSlf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +22,7 @@ import static com.thoughtworks.rslist.api.UserController.userList;
 import static com.thoughtworks.rslist.utils.Utils.isNull;
 import static com.thoughtworks.rslist.utils.Utils.strIsBlank;
 
+@Slf4j
 @RestController
 public class RsController {
   private  User oldUser =
@@ -32,10 +36,11 @@ public class RsController {
   @GetMapping("rs/list")
   public ResponseEntity getAllInList(@RequestParam(required = false) Integer startIndex,
                                      @RequestParam(required = false) Integer endIndex) throws OutOfIndexException {
+    if (startIndex == null || endIndex == null) return ResponseEntity.status(HttpStatus.OK).body(rsList);
     if (startIndex < 0 || endIndex > rsList.size()) {
       throw new OutOfIndexException("invalid request param");
     }
-    return new ResponseEntity(rsList.subList(startIndex - 1, endIndex), HttpStatus.OK);
+    return ResponseEntity.status(HttpStatus.OK).body(rsList.subList(startIndex - 1, endIndex));
   }
 
   @PostMapping("rs/item")
@@ -87,12 +92,10 @@ public class RsController {
 
   @ExceptionHandler({OutOfIndexException.class, MethodArgumentNotValidException.class})
   public ResponseEntity handleException(Exception ex) {
-    CommonError commonError = new CommonError();
-    if (ex instanceof OutOfIndexException) {
-      commonError.setError(ex.getMessage());
-    } else {
-      commonError.setError("invalid param");
-    }
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commonError);
+    Integer condition = GlobalExceptionHandler.OTHER_EXCEPTION;
+    if (ex instanceof MethodArgumentNotValidException) condition =GlobalExceptionHandler.INVAILD_FOR_RSEVENT;
+    log.error("Method {} error",this.getClass().getName());
+    return GlobalExceptionHandler.globalExHandle(ex, condition);
+
   }
 }
