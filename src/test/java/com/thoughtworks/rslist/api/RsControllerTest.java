@@ -219,4 +219,14 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void should_throw_MethodArgumentNotValidException_when_post_for_invalid_RsEvent() throws Exception {
+
+        String eventStr = "{\"eventName\":null,\"keyWord\":\"未分类\"," +
+                "\"user\":{\"userName\":\"newUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
+        mockMvc.perform(post("/rs/item").content(eventStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string("{\"error\":\"invalid param\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
 }

@@ -8,6 +8,7 @@ import com.thoughtworks.rslist.exception.OutOfIndexException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -84,10 +85,14 @@ public class RsController {
     return false;
   }
 
-  @ExceptionHandler({OutOfIndexException.class})
-  public ResponseEntity handleException(OutOfIndexException ex) {
+  @ExceptionHandler({OutOfIndexException.class, MethodArgumentNotValidException.class})
+  public ResponseEntity handleException(Exception ex) {
     CommonError commonError = new CommonError();
-    commonError.setExMsg(ex.getMessage());
+    if (ex instanceof OutOfIndexException) {
+      commonError.setError(ex.getMessage());
+    } else {
+      commonError.setError("invalid param");
+    }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commonError);
   }
 }
