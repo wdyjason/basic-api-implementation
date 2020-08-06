@@ -247,7 +247,7 @@ class RsControllerTest {
     }
 
     @Test
-    public void should_throw_MethodArgumentNotValidException_when_post_for_invalid_RsEvent() throws Exception {
+    public void should_throw_method_argument_not_valid_exception_when_post_for_invalid_RsEvent() throws Exception {
 
         String eventStr = "{\"eventName\":null,\"keyWord\":\"未分类\"," +
                 "\"user\":1}";
@@ -255,5 +255,23 @@ class RsControllerTest {
                 .andExpect(content().string("{\"error\":\"invalid param\"}"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void should_update_rsEvent_successful_when_patch() throws Exception {
+        rsEventRepository.save(RsEventEntity.builder()
+                .id(1)
+                .eventName("event")
+                .keyWord("keyW")
+                .userId(1)
+                .build());
+        String eventNameNullStr = "{\"eventName\":null,\"keyWord\":\"未分类\"," +
+                "\"userId\":1}";
+        mockMvc.perform(patch("/rs/2").content(eventNameNullStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        List<RsEventEntity> rsEventEntityList = rsEventRepository.findAll();
+        assertEquals("event", rsEventEntityList.get(0).getEventName());
+        assertEquals("未分类", rsEventEntityList.get(0).getKeyWord());
+    }
+
 
 }

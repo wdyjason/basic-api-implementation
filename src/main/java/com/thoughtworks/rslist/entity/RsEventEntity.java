@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.entity;
 
+import com.thoughtworks.rslist.validation.PatchForRsEventValidation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +28,7 @@ public class RsEventEntity {
     @NotNull
     private String keyWord;
 
-    @NotNull
+    @NotNull(groups = PatchForRsEventValidation.class)
     private Integer userId;
 
 }

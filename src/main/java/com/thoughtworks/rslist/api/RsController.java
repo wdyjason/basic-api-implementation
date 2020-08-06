@@ -8,6 +8,7 @@ import com.thoughtworks.rslist.exception.ContentEmptyException;
 import com.thoughtworks.rslist.exception.GlobalExceptionHandler;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
+import com.thoughtworks.rslist.validation.PatchForRsEventValidation;
 import com.thoughtworks.rslist.validation.ValidationGroup;
 import com.thoughtworks.rslist.exception.CommonError;
 import com.thoughtworks.rslist.exception.OutOfIndexException;
@@ -20,7 +21,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -93,6 +96,24 @@ public class RsController {
       throw new OutOfIndexException("invalid index");
     }
     return ResponseEntity.status(HttpStatus.OK).body(rsList.get(id - 1));
+  }
+
+  @Transactional
+  @PatchMapping("rs/{rsEventId}")
+  public ResponseEntity patchOneEvent(@PathVariable(name = "rsEventId") @NotNull int eventId,
+                            @RequestBody @Validated({PatchForRsEventValidation.class}) RsEventEntity rsEvent) {
+    Optional<RsEventEntity> rsEventWarp = rsEventRepository.findById(eventId);
+    if (rsEventWarp.isPresent() && rsEventWarp.get().getUserId() == rsEvent.getUserId()) {
+
+      if (rsEvent.getEventName() != null)
+        rsEventRepository.updateEventNameById(eventId, rsEvent.getEventName());
+
+      if (rsEvent.getKeyWord() != null)
+        rsEventRepository.updateKeyWordById(eventId, rsEvent.getKeyWord());
+
+      return ResponseEntity.status(HttpStatus.OK).build();
+    }
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
   }
 
   @ExceptionHandler({OutOfIndexException.class, MethodArgumentNotValidException.class, ContentEmptyException.class})
