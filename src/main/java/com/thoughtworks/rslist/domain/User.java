@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.*;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
@@ -53,6 +54,16 @@ public class User {
                 .email(email)
                 .gender(gender)
                 .phone(phone)
+                .build();
+    }
+
+    public static User formUserEntity(UserEntity userEntity) {
+        return User.builder()
+                .userName(userEntity.getUserName())
+                .age(userEntity.getAge())
+                .gender(userEntity.getGender())
+                .phone(userEntity.getPhone())
+                .email(userEntity.getEmail())
                 .build();
     }
 }
