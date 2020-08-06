@@ -101,5 +101,15 @@ class UserControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void should_throw_MethodArgumentNotValidException_when_post_for_invalid_user() throws Exception {
+
+        String invalidUserStr =
+                "{\"userName\":\"oldUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
+        mockMvc.perform(post("/user").content(invalidUserStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string("{\"error\":\"invalid user\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }
