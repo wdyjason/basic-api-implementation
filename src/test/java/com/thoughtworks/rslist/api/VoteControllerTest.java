@@ -52,5 +52,13 @@ class VoteControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void should_vote_fail_if_vote_num_more_than_tickets() throws Exception {
+        String voteStr = "{\"id\":1,\"voteNum\":11,\"userId\":1}";
+
+        mockMvc.perform(post("/rs/vote/1").content(voteStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 
 }
