@@ -2,7 +2,9 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.CommonError;
+import com.thoughtworks.rslist.exception.GlobalExceptionHandler;
 import com.thoughtworks.rslist.validation.ValidationGroup;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +15,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @RestController
 public class UserController {
     public static List<User> userList = new ArrayList<>();
@@ -20,7 +23,7 @@ public class UserController {
     @PostMapping("/user")
     public ResponseEntity registerUser(@RequestBody @Validated(ValidationGroup.class) User user) {
         userList.add(user);
-        return new ResponseEntity("index: " + (userList.size() - 0), HttpStatus.CREATED);
+        return new ResponseEntity("index: " + (userList.size() - 1), HttpStatus.CREATED);
     }
 
     @GetMapping("/users")
@@ -30,9 +33,8 @@ public class UserController {
 
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity handleException(MethodArgumentNotValidException ex) {
-        CommonError error = new CommonError();
-        error.setError("invalid user");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        log.error("Method {} error",this.getClass().getName());
+        return GlobalExceptionHandler.globalExHandle(ex, GlobalExceptionHandler.INVAILD_FOR_USER);
     }
 
 }
