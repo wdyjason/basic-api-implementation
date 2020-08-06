@@ -205,4 +205,11 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void should_throw_exception_when_index_pout_of_bounds() throws Exception {
+        mockMvc.perform(get("/rs/list/?startIndex=1&endIndex=5"))
+                .andExpect(content().string("{\"error\":\"invalid request param\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
 }
