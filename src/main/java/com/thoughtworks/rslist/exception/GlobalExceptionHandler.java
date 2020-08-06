@@ -11,7 +11,7 @@ public class GlobalExceptionHandler {
 
     public static ResponseEntity globalExHandle(Exception ex, int condition) {
         CommonError commonError = new CommonError();
-        if (ex instanceof OutOfIndexException) {
+        if (ex instanceof OutOfIndexException || ex instanceof ContentEmptyException) {
             commonError.setError(ex.getMessage());
         }
         if (ex instanceof MethodArgumentNotValidException) {

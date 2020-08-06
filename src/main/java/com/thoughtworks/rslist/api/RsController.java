@@ -2,19 +2,27 @@ package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.entity.RsEventEntity;
+import com.thoughtworks.rslist.entity.UserEntity;
+import com.thoughtworks.rslist.exception.ContentEmptyException;
 import com.thoughtworks.rslist.exception.GlobalExceptionHandler;
+import com.thoughtworks.rslist.repository.RsEventRepository;
+import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.validation.ValidationGroup;
 import com.thoughtworks.rslist.exception.CommonError;
 import com.thoughtworks.rslist.exception.OutOfIndexException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.extern.slf4j.XSlf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,10 +35,16 @@ public class RsController {
   private  User oldUser =
           new User("oldUser", 20, "male", "a@qq.com", "18888888888");
 
-  private  List<RsEvent> rsList = Stream.of(new RsEvent("第一条事件", "经济", oldUser),
+  public  List<RsEvent> rsList = Stream.of(new RsEvent("第一条事件", "经济", oldUser),
           new RsEvent("第二条事件", "文化", oldUser),
           new RsEvent("第三条事件", "政治", oldUser))
           .collect(Collectors.toList());
+
+  @Autowired
+  private RsEventRepository rsEventRepository;
+
+  @Autowired
+  private UserRepository userRepository;
 
   @GetMapping("rs/list")
   public ResponseEntity getAllInList(@RequestParam(required = false) Integer startIndex,
@@ -43,12 +57,12 @@ public class RsController {
   }
 
   @PostMapping("rs/item")
-  public ResponseEntity addOne(@RequestBody @Validated(ValidationGroup.class) RsEvent newEvent) {
+  public ResponseEntity addOne(@RequestBody @Valid RsEventEntity newEvent) throws ContentEmptyException {
     isNull(newEvent, "requestBody is null");
-    if (containSameUserInList(newEvent.getUser(), userList)) {
-      rsList.add(newEvent);
+    if (userRepository.existsById(newEvent.getUserId())) {
+      rsEventRepository.save(newEvent);
     } else {
-      userList.add(newEvent.getUser());
+      throw new ContentEmptyException("invalid user to add rsEvent");
     }
     return ResponseEntity.status(HttpStatus.CREATED).body("index: " + (rsList.size() - 1));
   }
@@ -81,7 +95,7 @@ public class RsController {
     return ResponseEntity.status(HttpStatus.OK).body(rsList.get(id - 1));
   }
 
-  @ExceptionHandler({OutOfIndexException.class, MethodArgumentNotValidException.class})
+  @ExceptionHandler({OutOfIndexException.class, MethodArgumentNotValidException.class, ContentEmptyException.class})
   public ResponseEntity handleException(Exception ex) {
     Integer condition = GlobalExceptionHandler.OTHER_EXCEPTION;
     if (ex instanceof MethodArgumentNotValidException) condition =GlobalExceptionHandler.INVAILD_FOR_RSEVENT;

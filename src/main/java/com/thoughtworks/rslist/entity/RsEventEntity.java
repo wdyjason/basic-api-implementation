@@ -1,35 +1,35 @@
 package com.thoughtworks.rslist.entity;
 
-import com.thoughtworks.rslist.domain.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Data
-@Builder
 @Entity
-@Table(name = "rs_user")
+@Builder
+@Table(name = "rs_event")
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity {
+public class RsEventEntity {
 
     @Id
     @GeneratedValue
     private Integer id;
 
-    @Column(name = "name")
     @NotNull
-    private String userName;
+    private String eventName;
 
-    private Integer age;
+    @NotNull
+    private String keyWord;
 
-    private String gender;
+    @NotNull
+    private Integer UserId;
 
-    private String email;
-
-    private String phone;
 }

@@ -3,6 +3,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.entity.RsEventEntity;
+import com.thoughtworks.rslist.entity.UserEntity;
+import com.thoughtworks.rslist.repository.RsEventRepository;
+import com.thoughtworks.rslist.repository.UserRepository;
+import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -10,6 +16,7 @@ import org.omg.CORBA.Object;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.web.JsonPath;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,9 +34,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 class RsControllerTest {
 
+    @Autowired
     MockMvc mockMvc;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private RsEventRepository rsEventRepository;
+
+    @Autowired
+    ApplicationContext applicationContext;
 
     private User oldUser =
             new User("oldUser", 20, "male", "a@qq.com", "18888888888");
@@ -39,8 +57,23 @@ class RsControllerTest {
 
 
     @BeforeEach
-    public void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new RsController()).build();
+    public void setUp() throws NoSuchFieldException, IllegalAccessException {
+        userRepository.save(UserEntity.builder()
+                .id(1)
+                .age(20)
+                .userName("oldUser")
+                .gender("male")
+                .email("a@qq.com")
+                .phone("18888888888")
+                .build());
+
+        RsController rsController = applicationContext.getBean(RsController.class);
+        Field rsList = rsController.getClass().getField("rsList");
+        rsList.set(rsController, Stream.of(new RsEvent("第一条事件", "经济", oldUser),
+                new RsEvent("第二条事件", "文化", oldUser),
+                new RsEvent("第三条事件", "政治", oldUser))
+                .collect(Collectors.toList()));
+
         UserController.userList = Stream.of(oldUser).collect(Collectors.toList());
     }
 
@@ -72,32 +105,26 @@ class RsControllerTest {
     }
 
     @Test
-    public void should_add_item_successful_when_receive_post_request() throws Exception {
-//        RsEvent postEvent = new RsEvent("第四条事件", "军事", oldUser);
-//        ObjectMapper objectMapper = new ObjectMapper();
+    public void should_add_item_successful_when_receive_old_user_post_request() throws Exception {
         String postEventStr = "{\"eventName\":\"第四条事件\",\"keyWord\":\"军事\"," +
-                "\"user\":{\"userName\":\"oldUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
-        System.out.println(postEventStr);
+                "\"userId\": 1}";
         mockMvc.perform(post("/rs/item")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(postEventStr))
-                .andExpect(content().string("index: 3"))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/rs/list"))
-                .andExpect(jsonPath("$[0].eventName").value("第一条事件"))
-                .andExpect(jsonPath("$[0].keyWord").value("经济"))
-                .andExpect(jsonPath("$[0]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[1].eventName").value("第二条事件"))
-                .andExpect(jsonPath("$[1].keyWord").value("文化"))
-                .andExpect(jsonPath("$[1]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[2].eventName").value("第三条事件"))
-                .andExpect(jsonPath("$[2].keyWord").value("政治"))
-                .andExpect(jsonPath("$[2]", not(hasKey("user"))))
-                .andExpect(jsonPath("$[3].eventName").value("第四条事件"))
-                .andExpect(jsonPath("$[3].keyWord").value("军事"))
-                .andExpect(jsonPath("$[3]", not(hasKey("user"))))
-                .andExpect(status().isOk());
+        List<RsEventEntity> rsEventEntities = rsEventRepository.findAll();
+        assertEquals(1, rsEventEntities.size());
+    }
+
+    @Test
+    public void should_bad_request_when_receive_new_user_post_request() throws Exception {
+        String postEventStr = "{\"eventName\":\"第四条事件\",\"keyWord\":\"军事\"," +
+                "\"userId\": 2}";
+        mockMvc.perform(post("/rs/item")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(postEventStr))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -146,19 +173,19 @@ class RsControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
-    public void should_add_user_successful_when_post_new_user() throws Exception {
-//        User newUser =
-//                new User("newUser", 20, "male", "a@qq.com", "18888888888");
-//        RsEvent postEvent = new RsEvent("修改的事件", "未分类", newUser);
-//        ObjectMapper objectMapper = new ObjectMapper();
-        String eventStr = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
-                "\"user\":{\"userName\":\"newUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
-        mockMvc.perform(post("/rs/item").content(eventStr).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string("index: 2"))
-                .andExpect(status().isCreated());
-//        assertEquals(newUser.toString(), UserController.userList.get(1).toString());
-    }
+//    @Test
+//    public void should_add_user_successful_when_post_new_user() throws Exception {
+////        User newUser =
+////                new User("newUser", 20, "male", "a@qq.com", "18888888888");
+////        RsEvent postEvent = new RsEvent("修改的事件", "未分类", newUser);
+////        ObjectMapper objectMapper = new ObjectMapper();
+//        String eventStr = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
+//                "\"user\":1}";
+//        mockMvc.perform(post("/rs/item").content(eventStr).contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(content().string("index: 2"))
+//                .andExpect(status().isCreated());
+////        assertEquals(newUser.toString(), UserController.userList.get(1).toString());
+//    }
 
     @Test
     public void user_name_max_size_is_8_when_post_event() throws Exception {
@@ -223,7 +250,7 @@ class RsControllerTest {
     public void should_throw_MethodArgumentNotValidException_when_post_for_invalid_RsEvent() throws Exception {
 
         String eventStr = "{\"eventName\":null,\"keyWord\":\"未分类\"," +
-                "\"user\":{\"userName\":\"newUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
+                "\"user\":1}";
         mockMvc.perform(post("/rs/item").content(eventStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("{\"error\":\"invalid param\"}"))
                 .andExpect(status().isBadRequest());
