@@ -3,7 +3,7 @@ package com.thoughtworks.rslist.exception;
 public class CommonError {
     private String error;
 
-    public void setExMsg(String error) {
+    public void setError(String error) {
         this.error = error;
     }
 
