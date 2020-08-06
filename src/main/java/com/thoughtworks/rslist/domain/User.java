@@ -2,9 +2,11 @@ package com.thoughtworks.rslist.domain;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thoughtworks.rslist.entity.UserEntity;
 import com.thoughtworks.rslist.validation.FirstValidation;
 import com.thoughtworks.rslist.validation.SecondValidation;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -43,4 +45,14 @@ public class User {
     @JsonProperty("user_phone")
     @JsonAlias("phone")
     private String phone;
+
+    public UserEntity toEntity() {
+        return UserEntity.builder()
+                .userName(userName)
+                .age(age)
+                .email(email)
+                .gender(gender)
+                .phone(phone)
+                .build();
+    }
 }

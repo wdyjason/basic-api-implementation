@@ -3,6 +3,9 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.entity.UserEntity;
+import com.thoughtworks.rslist.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,12 +30,19 @@ class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    UserRepository userRepository;
     private String oldUserStr =
             "{\"userName\":\"oldUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
 
     @BeforeEach
     public void setUp() {
         UserController.userList.clear();
+    }
+
+    @AfterEach
+    public void destroy() {
+        userRepository.deleteAll();
     }
 
     @Test
@@ -111,5 +122,13 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void should_save_one_success() throws Exception {
+        mockMvc.perform(post("/user").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string("index: 0"))
+                .andExpect(status().isCreated());
+        List<UserEntity> userEntities = userRepository.findAll();
+        assertEquals(1, userEntities.size());
+    }
 
 }
