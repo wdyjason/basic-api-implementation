@@ -100,7 +100,7 @@ public class RsController {
     Integer condition = GlobalExceptionHandler.OTHER_EXCEPTION;
     if (ex instanceof MethodArgumentNotValidException) condition =GlobalExceptionHandler.INVAILD_FOR_RSEVENT;
 
-    log.error("Method {} error",this.getClass().getName());
+    log.error("Method {} error {}",this.getClass().getName(), ex.getClass());
 
     return GlobalExceptionHandler.globalExHandle(ex, condition);
   }

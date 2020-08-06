@@ -3,7 +3,9 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.entity.RsEventEntity;
 import com.thoughtworks.rslist.entity.UserEntity;
+import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +17,7 @@ import org.springframework.data.web.JsonPath;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,8 +35,10 @@ class UserControllerTest {
     private MockMvc mockMvc;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    RsEventRepository rsEventRepository;
     private String oldUserStr =
-            "{\"userName\":\"oldUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
+            "{\"id\":1,\"userName\":\"oldUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
 
     @BeforeEach
     public void setUp() {
@@ -109,7 +114,7 @@ class UserControllerTest {
     }
 
     @Test
-    public void should_throw_MethodArgumentNotValidException_when_post_for_invalid_user() throws Exception {
+    public void should_throw_method_argument_not_valid_exception_when_post_for_invalid_user() throws Exception {
 
         String invalidUserStr =
                 "{\"userName\":\"oldUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888\"}";
@@ -129,11 +134,16 @@ class UserControllerTest {
 
     @Test
     public void should_get_one_successful() throws Exception {
-        mockMvc.perform(post("/user").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string("index: 0"))
-                .andExpect(status().isCreated());
+        userRepository.save(UserEntity.builder()
+                .id(1)
+                .userName("oldUser")
+                .phone("18888888888")
+                .email("a@qq.com")
+                .gender("male")
+                .age(20)
+                .build());
 
-        mockMvc.perform(get("/user/2").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/user/3").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_name", is("oldUser")))
                 .andExpect(jsonPath("$.user_age",  is(20)))
                 .andExpect(jsonPath("$.user_gender",  is("male")))
@@ -144,15 +154,26 @@ class UserControllerTest {
 
     @Test
     public void should_delete_one_by_id_successful() throws Exception {
-        mockMvc.perform(post("/user").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string("index: 0"))
-                .andExpect(status().isCreated());
+        userRepository.save(UserEntity.builder()
+                .id(1)
+                .userName("userName")
+                .phone("18888888888")
+                .email("a@qq.com")
+                .gender("male")
+                .age(20)
+                .build());
+
+        rsEventRepository.saveAll(Arrays.asList(new RsEventEntity(1, "nameA", "kWordA", 1),
+                                                new RsEventEntity(2, "nameB", "kWordB",1)));
 
         mockMvc.perform(delete("/user/1").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         List<UserEntity> userEntities = userRepository.findAll();
         assertEquals(0, userEntities.size());
+
+        List<RsEventEntity> RsEventEntites = rsEventRepository.findAll();
+        assertEquals(0, RsEventEntites.size());
     }
 
 }

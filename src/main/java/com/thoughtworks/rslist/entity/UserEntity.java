@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @Builder
@@ -32,4 +33,7 @@ public class UserEntity {
     private String email;
 
     private String phone;
+
+    @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "userId")
+    List<RsEventEntity> rsEventEntityList;
 }

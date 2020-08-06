@@ -47,8 +47,7 @@ public class UserController {
     public User getUserById(@PathVariable Integer id) throws OutOfIndexException, ContentEmptyException {
         if (id == null) throw new OutOfIndexException("invalid id");
 
-        Optional<UserEntity> userEntityWarp = userRepository.findById(id);
-        if (!userEntityWarp.isPresent()) throw new ContentEmptyException("not find user");
+         if (!userRepository.existsById(id)) throw new ContentEmptyException("not find user");
 
         return User.formUserEntity(userRepository.findById(id).get());
     }
@@ -66,7 +65,7 @@ public class UserController {
         Integer condition = GlobalExceptionHandler.OTHER_EXCEPTION;
         if (ex instanceof MethodArgumentNotValidException) condition =GlobalExceptionHandler.INVAILD_FOR_USER;
 
-        log.error("Method {} error",this.getClass().getName());
+        log.error("Method {} error {}",this.getClass().getName(), ex.getClass());
 
         return GlobalExceptionHandler.globalExHandle(ex, condition);
     }
