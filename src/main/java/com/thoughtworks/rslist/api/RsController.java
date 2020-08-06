@@ -19,8 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.thoughtworks.rslist.api.UserController.userList;
-import static com.thoughtworks.rslist.utils.Utils.isNull;
-import static com.thoughtworks.rslist.utils.Utils.strIsBlank;
+import static com.thoughtworks.rslist.utils.Utils.*;
 
 @Slf4j
 @RestController
@@ -46,12 +45,12 @@ public class RsController {
   @PostMapping("rs/item")
   public ResponseEntity addOne(@RequestBody @Validated(ValidationGroup.class) RsEvent newEvent) {
     isNull(newEvent, "requestBody is null");
-    if (containSameUserInList(newEvent.getUser())) {
+    if (containSameUserInList(newEvent.getUser(), userList)) {
       rsList.add(newEvent);
     } else {
       userList.add(newEvent.getUser());
     }
-    return new ResponseEntity("index: " + (rsList.size() - 1),HttpStatus.CREATED);
+    return ResponseEntity.status(HttpStatus.CREATED).body("index: " + (rsList.size() - 1));
   }
 
   @PutMapping("rs/item/{id}")
@@ -65,13 +64,13 @@ public class RsController {
     if (strIsBlank(newKeyWord)) {
       rsList.get(id - 1).setKeyWord(newKeyWord);
     }
-    return new ResponseEntity(HttpStatus.OK);
+    return ResponseEntity.status(HttpStatus.OK).body(null);
   }
 
   @DeleteMapping("rs/item/{id}")
   public ResponseEntity deleteOneById(@PathVariable int id) {
     rsList.remove(rsList.get(id - 1));
-    return new ResponseEntity(HttpStatus.OK);
+    return ResponseEntity.status(HttpStatus.OK).body(null);
   }
 
   @GetMapping("rs/{id}")
@@ -79,23 +78,16 @@ public class RsController {
     if (id < 0 || id >= rsList.size()) {
       throw new OutOfIndexException("invalid index");
     }
-    return new ResponseEntity(rsList.get(id - 1), HttpStatus.OK);
-  }
-
-  public boolean containSameUserInList(User addUser) {
-    for (User u : userList) {
-      if (u.getUserName().equals(addUser.getUserName()))
-        return true;
-    }
-    return false;
+    return ResponseEntity.status(HttpStatus.OK).body(rsList.get(id - 1));
   }
 
   @ExceptionHandler({OutOfIndexException.class, MethodArgumentNotValidException.class})
   public ResponseEntity handleException(Exception ex) {
     Integer condition = GlobalExceptionHandler.OTHER_EXCEPTION;
     if (ex instanceof MethodArgumentNotValidException) condition =GlobalExceptionHandler.INVAILD_FOR_RSEVENT;
-    log.error("Method {} error",this.getClass().getName());
-    return GlobalExceptionHandler.globalExHandle(ex, condition);
 
+    log.error("Method {} error",this.getClass().getName());
+
+    return GlobalExceptionHandler.globalExHandle(ex, condition);
   }
 }
