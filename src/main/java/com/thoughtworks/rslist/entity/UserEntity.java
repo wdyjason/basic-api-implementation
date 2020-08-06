@@ -34,6 +34,8 @@ public class UserEntity {
 
     private String phone;
 
+    private Integer tickets;
+
     @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "userId")
     List<RsEventEntity> rsEventEntityList;
 }
