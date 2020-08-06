@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,14 @@ public class UserController {
         if (!userEntityWarp.isPresent()) throw new ContentEmptyException("not find user");
 
         return User.formUserEntity(userRepository.findById(id).get());
+    }
+
+    @DeleteMapping("user/{id}")
+    @Transactional
+    public void deleteOneById(@PathVariable Integer id) throws OutOfIndexException {
+        if (id == null) throw new OutOfIndexException("invalid id");
+
+        userRepository.deleteById(id);
     }
 
     @ExceptionHandler({OutOfIndexException.class, MethodArgumentNotValidException.class, ContentEmptyException.class})
