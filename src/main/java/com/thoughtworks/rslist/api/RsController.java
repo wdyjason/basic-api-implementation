@@ -1,17 +1,15 @@
 package com.thoughtworks.rslist.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
-import com.thoughtworks.rslist.validation.FirstValidation;
 import com.thoughtworks.rslist.validation.ValidationGroup;
+import com.thoughtworks.rslist.exception.CommonError;
+import com.thoughtworks.rslist.exception.OutOfIndexException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,9 +30,9 @@ public class RsController {
 
   @GetMapping("rs/list")
   public ResponseEntity getAllInList(@RequestParam(required = false) Integer startIndex,
-                                     @RequestParam(required = false) Integer endIndex) {
-    if (startIndex == null || endIndex == null) {
-      return new ResponseEntity(rsList, HttpStatus.OK);
+                                     @RequestParam(required = false) Integer endIndex) throws OutOfIndexException {
+    if (startIndex < 0 || endIndex > rsList.size()) {
+      throw new OutOfIndexException("invalid request param");
     }
     return new ResponseEntity(rsList.subList(startIndex - 1, endIndex), HttpStatus.OK);
   }
@@ -81,5 +79,12 @@ public class RsController {
         return true;
     }
     return false;
+  }
+
+  @ExceptionHandler({OutOfIndexException.class})
+  public ResponseEntity handleException(OutOfIndexException ex) {
+    CommonError commonError = new CommonError();
+    commonError.setExMsg(ex.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commonError);
   }
 }
