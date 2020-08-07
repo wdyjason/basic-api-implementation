@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static com.thoughtworks.rslist.utils.Utils.strIsBlank;
 
-@Service
+
 public class RsService {
     @Autowired
     UserRepository userRepository;
