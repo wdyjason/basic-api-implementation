@@ -51,7 +51,7 @@ class VoteControllerTest {
     public void should_vote_successfully_if_vote_num_less_than_tickets() throws Exception {
         String voteStr = "{\"id\":1,\"voteNum\":1,\"userId\":1,\"voteTime\":\"2019-10-31T20:30:59\"}";
 
-        mockMvc.perform(post("/rs/vote/1").content(voteStr).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/1/vote").content(voteStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -59,7 +59,7 @@ class VoteControllerTest {
     public void should_vote_fail_if_vote_num_more_than_tickets() throws Exception {
         String voteStr = "{\"id\":1,\"voteNum\":11,\"userId\":1,\"voteTime\":\"2019-10-31T20:30:59\"}";
 
-        mockMvc.perform(post("/rs/vote/1").content(voteStr).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/1/vote").content(voteStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 

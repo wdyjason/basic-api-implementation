@@ -23,7 +23,7 @@ public class VoteController {
     @Autowired
     VoteRepository voteRepository;
 
-    @PostMapping("/rs/vote/{rsEventId}")
+    @PostMapping("/rs/{rsEventId}/vote")
     public ResponseEntity voteForEvent(@PathVariable Integer rsEventId,
                                        @RequestBody VoteEntity voteEntity) throws ContentEmptyException {
         Optional<UserEntity> voteUserWarp = userRepository.findById(voteEntity.getUserId());
