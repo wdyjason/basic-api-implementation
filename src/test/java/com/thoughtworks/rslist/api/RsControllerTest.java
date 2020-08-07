@@ -120,7 +120,7 @@ class RsControllerTest {
     public void should_add_item_successful_when_receive_old_user_post_request() throws Exception {
         String postEventStr = "{\"eventName\":\"第四条事件\",\"keyWord\":\"军事\"," +
                 "\"userId\": "+ savedUserId +"}";
-        mockMvc.perform(post("/rs/item")
+        mockMvc.perform(post("/rs/")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(postEventStr))
                 .andExpect(status().isCreated());
@@ -132,7 +132,7 @@ class RsControllerTest {
     public void should_bad_request_when_receive_new_user_post_request() throws Exception {
         String postEventStr = "{\"eventName\":\"第四条事件\",\"keyWord\":\"军事\"," +
                 "\"userId\": 2}";
-        mockMvc.perform(post("/rs/item")
+        mockMvc.perform(post("/rs/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(postEventStr))
                 .andExpect(status().isBadRequest());
@@ -142,7 +142,7 @@ class RsControllerTest {
     public void should_replace_one_by_id_successful() throws Exception {
         String putEventStr ="{\"id\":" + savedEventId +
                 ",\"eventName\":\"changed\",\"keyWord\":\"changed\",\"voteNum\":null,\"userId\":" + savedUserId + "}";
-        mockMvc.perform(put("/rs/item/")
+        mockMvc.perform(put("/rs/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(putEventStr))
                 .andExpect(status().isOk());
@@ -156,7 +156,7 @@ class RsControllerTest {
 
     @Test
     public void should_delete_one_by_id_successful() throws Exception {
-        mockMvc.perform(delete("/rs/item/" + savedEventId))
+        mockMvc.perform(delete("/rs/" + savedEventId))
                 .andExpect(status().isOk());
         assertEquals(false, rsEventRepository.existsById(savedEventId));
     }
@@ -176,12 +176,12 @@ class RsControllerTest {
     public void  user_age_should_between_18_and_100_when_post_event() throws Exception {
         String oldUserAge101 = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
                 "\"user\":{\"userName\":\"oldUser\",\"age\":101,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
-        mockMvc.perform(post("/rs/item").content(oldUserAge101).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/").content(oldUserAge101).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
         String oldUserAge17 = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
                 "\"user\":{\"userName\":\"oldUser\",\"age\":17,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
-        mockMvc.perform(post("/rs/item").content(oldUserAge17).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/").content(oldUserAge17).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -189,7 +189,7 @@ class RsControllerTest {
     public void user_gender_is_not_null_when_post_event() throws Exception {
         String oldUserGenderNull = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
                 "\"user\":{\"userName\":\"oldUser\",\"age\":2 0,\"gender\":\"null\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
-        mockMvc.perform(post("/rs/item").content(oldUserGenderNull).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/").content(oldUserGenderNull).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -197,7 +197,7 @@ class RsControllerTest {
     public void user_email_should_correct_when_post_event() throws Exception {
         String oldUserEmailWrong = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
                 "\"user\":{\"userName\":\"oldUser\",\"age\":2 0,\"gender\":\"male\",\"email\":\"aqq.com\",\"phone\":\"18888888888\"}";
-        mockMvc.perform(post("/rs/item").content(oldUserEmailWrong).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/").content(oldUserEmailWrong).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -205,7 +205,7 @@ class RsControllerTest {
     public void user_phone_should_correct_when_post_event() throws Exception {
         String oldUserPhoneWrong = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
                 "\"user\":{\"userName\":\"oldUser\",\"age\":2 0,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888\"}";
-        mockMvc.perform(post("/rs/item").content(oldUserPhoneWrong).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/").content(oldUserPhoneWrong).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -221,7 +221,7 @@ class RsControllerTest {
 
         String eventStr = "{\"eventName\":null,\"keyWord\":\"未分类\"," +
                 "\"user\":1}";
-        mockMvc.perform(post("/rs/item").content(eventStr).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(post("/rs/").content(eventStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string("{\"error\":\"invalid param\"}"))
                 .andExpect(status().isBadRequest());
     }

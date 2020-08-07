@@ -64,7 +64,7 @@ public class RsController {
     return ResponseEntity.status(HttpStatus.OK).body(RsEventDTO.fromEntity(result));
   }
 
-  @PostMapping("rs/item")
+  @PostMapping("rs/")
   public ResponseEntity addOne(@RequestBody @Valid RsEventEntity newEvent) throws ContentEmptyException {
     isNull(newEvent, "requestBody is null");
     if (userRepository.existsById(newEvent.getUserId())) {
@@ -75,7 +75,7 @@ public class RsController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PutMapping("rs/item")
+  @PutMapping("rs/")
   @Transactional
   public ResponseEntity replaceOneById(@RequestBody @Valid RsEventDTO rsEventDTO) {
     isNull(rsEventDTO, "requestBody is null");
@@ -88,7 +88,7 @@ public class RsController {
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @DeleteMapping("rs/item/{id}")
+  @DeleteMapping("rs/{id}")
   public ResponseEntity deleteOneById(@PathVariable int id) {
     rsEventRepository.deleteById(id);
     return ResponseEntity.status(HttpStatus.OK).build();
