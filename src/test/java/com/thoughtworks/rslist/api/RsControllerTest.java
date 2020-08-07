@@ -67,9 +67,6 @@ class RsControllerTest {
     private User oldUser =
             new User("oldUser", 20, "male", "a@qq.com", "18888888888");
 
-    private String oldUserStr =
-            "{\"userName\":\"oldUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
-
 
     private UserEntity initialUserEntity = UserEntity.builder()
             .age(20)

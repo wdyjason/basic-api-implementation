@@ -33,7 +33,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.thoughtworks.rslist.api.UserController.userList;
 import static com.thoughtworks.rslist.utils.Utils.*;
 
 @Slf4j
