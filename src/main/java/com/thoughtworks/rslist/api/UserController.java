@@ -23,8 +23,11 @@ import java.util.stream.Collectors;
 @RestController
 public class UserController {
 
-    @Autowired
     private UserRepository userRepository;
+
+    public UserController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @PostMapping("/user")
     public ResponseEntity registerUser(@RequestBody @Validated(ValidationGroup.class) User user) {

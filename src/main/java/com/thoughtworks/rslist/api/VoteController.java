@@ -17,11 +17,13 @@ import java.util.Optional;
 @RestController
 public class VoteController {
 
-    @Autowired
     UserRepository userRepository;
-
-    @Autowired
     VoteRepository voteRepository;
+
+    public VoteController(UserRepository userRepository, VoteRepository voteRepository) {
+        this.userRepository = userRepository;
+        this.voteRepository = voteRepository;
+    }
 
     @PostMapping("/rs/vote/{rsEventId}")
     public ResponseEntity voteForEvent(@PathVariable Integer rsEventId,

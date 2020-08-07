@@ -20,14 +20,17 @@ import static com.thoughtworks.rslist.utils.Utils.strIsBlank;
 
 
 public class RsService {
-    @Autowired
+
     UserRepository userRepository;
-
-    @Autowired
     VoteRepository voteRepository;
-
-    @Autowired
     RsEventRepository rsEventRepository;
+
+    public RsService(UserRepository userRepository, VoteRepository voteRepository, RsEventRepository rsEventRepository) {
+        this.userRepository = userRepository;
+        this.voteRepository = voteRepository;
+        this.rsEventRepository = rsEventRepository;
+    }
+
 
     public List<RsEventDTO> findAllRsEvent(Integer pageIndex, Integer pageSize) {
 

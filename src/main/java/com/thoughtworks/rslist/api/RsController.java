@@ -29,14 +29,11 @@ import static com.thoughtworks.rslist.utils.Utils.*;
 @RestController
 public class RsController {
 
-  @Autowired
-  private RsEventRepository rsEventRepository;
-
-  @Autowired
-  private UserRepository userRepository;
-
-  @Autowired
   private RsService rsService;
+
+  public RsController(RsService rsService) {
+    this.rsService = rsService;
+  }
 
   @GetMapping("rs/list")
   public List<RsEventDTO> getAllInList(@RequestParam(required = false) Integer pageSize,
