@@ -22,33 +22,31 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
 public class UserController {
-    public static List<User> userList = new ArrayList<>();
 
     @Autowired
     private UserRepository userRepository;
 
     @PostMapping("/user")
     public ResponseEntity registerUser(@RequestBody @Validated(ValidationGroup.class) User user) {
-        userList.add(user);
         userRepository.save(user.toEntity());
-        return new ResponseEntity("index: " + (userList.size() - 1), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/users")
     public List<User> getUsers() {
-        return userList;
+        return userRepository.findAll().stream().map(f -> User.formUserEntity(f)).collect(Collectors.toList());
     }
 
     @GetMapping("/user/{id}")
     public User getUserById(@PathVariable Integer id) throws OutOfIndexException, ContentEmptyException {
         if (id == null) throw new OutOfIndexException("invalid id");
 
-        Optional<UserEntity> userEntityWarp = userRepository.findById(id);
-        if (!userEntityWarp.isPresent()) throw new ContentEmptyException("not find user");
+         if (!userRepository.existsById(id)) throw new ContentEmptyException("not find user");
 
         return User.formUserEntity(userRepository.findById(id).get());
     }
@@ -66,7 +64,7 @@ public class UserController {
         Integer condition = GlobalExceptionHandler.OTHER_EXCEPTION;
         if (ex instanceof MethodArgumentNotValidException) condition =GlobalExceptionHandler.INVAILD_FOR_USER;
 
-        log.error("Method {} error",this.getClass().getName());
+        log.error("Method {} error {}",this.getClass().getName(), ex.getClass());
 
         return GlobalExceptionHandler.globalExHandle(ex, condition);
     }
