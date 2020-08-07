@@ -37,21 +37,25 @@ class UserControllerTest {
     UserRepository userRepository;
     @Autowired
     RsEventRepository rsEventRepository;
+
+    private int savedUserId;
+
     private String oldUserStr =
             "{\"id\":1,\"userName\":\"oldUser\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}";
 
+    private UserEntity initialUserEntity = UserEntity.builder()
+            .age(20)
+            .userName("oldUser")
+            .gender("male")
+            .email("a@qq.com")
+            .phone("18888888888")
+            .tickets(9)
+            .build();
+
     @BeforeEach
     public void setUp() {
-        UserController.userList.clear();
         userRepository.deleteAll();
-    }
-
-    @Test
-    public void should_add_user_successful() throws Exception {
-        mockMvc.perform(post("/user").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string("index: 0"))
-                .andExpect(status().isCreated());
-        assertEquals(1, UserController.userList.size());
+        savedUserId = userRepository.save(initialUserEntity).getId();
     }
 
     @Test
@@ -101,15 +105,40 @@ class UserControllerTest {
 
     @Test
     public void should_get_all_users() throws Exception {
-        UserController.userList =
-                Stream.of(new User("oldUser", 20, "male", "a@qq.com", "18888888888"))
-                        .collect(Collectors.toList());
+        UserEntity user2nd = UserEntity.builder()
+                .age(20)
+                .userName("2nd")
+                .gender("female")
+                .email("a@qq.com")
+                .phone("18888888888")
+                .tickets(9)
+                .build();
+        UserEntity user3rd = UserEntity.builder()
+                .age(20)
+                .userName("3rd")
+                .gender("female")
+                .email("b@qq.com")
+                .phone("18888888888")
+                .tickets(9)
+                .build();
+        userRepository.saveAll(Arrays.asList(user2nd, user3rd));
+
         mockMvc.perform(get("/users"))
                 .andExpect(jsonPath("$[0].user_name", is("oldUser")))
                 .andExpect(jsonPath("$[0].user_age", is(20)))
                 .andExpect(jsonPath("$[0].user_gender", is("male")))
                 .andExpect(jsonPath("$[0].user_email", is("a@qq.com")))
                 .andExpect(jsonPath("$[0].user_phone", is("18888888888")))
+                .andExpect(jsonPath("$[1].user_name", is("2nd")))
+                .andExpect(jsonPath("$[1].user_age", is(20)))
+                .andExpect(jsonPath("$[1].user_gender", is("female")))
+                .andExpect(jsonPath("$[1].user_email", is("a@qq.com")))
+                .andExpect(jsonPath("$[1].user_phone", is("18888888888")))
+                .andExpect(jsonPath("$[2].user_name", is("3rd")))
+                .andExpect(jsonPath("$[2].user_age", is(20)))
+                .andExpect(jsonPath("$[2].user_gender", is("female")))
+                .andExpect(jsonPath("$[2].user_email", is("b@qq.com")))
+                .andExpect(jsonPath("$[2].user_phone", is("18888888888")))
                 .andExpect(status().isOk());
     }
 
@@ -126,24 +155,14 @@ class UserControllerTest {
     @Test
     public void should_save_one_success() throws Exception {
         mockMvc.perform(post("/user").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string("index: 0"))
                 .andExpect(status().isCreated());
-        List<UserEntity> userEntities = userRepository.findAll();
-        assertEquals(1, userEntities.size());
+        assertEquals(2, userRepository.count());
     }
 
     @Test
     public void should_get_one_successful() throws Exception {
-        userRepository.save(UserEntity.builder()
-                .id(1)
-                .userName("oldUser")
-                .phone("18888888888")
-                .email("a@qq.com")
-                .gender("male")
-                .age(20)
-                .build());
 
-        mockMvc.perform(get("/user/3").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/user/" + savedUserId).content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.user_name", is("oldUser")))
                 .andExpect(jsonPath("$.user_age",  is(20)))
                 .andExpect(jsonPath("$.user_gender",  is("male")))
