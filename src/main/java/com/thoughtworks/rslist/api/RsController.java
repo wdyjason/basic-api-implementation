@@ -7,6 +7,7 @@ import com.thoughtworks.rslist.exception.GlobalExceptionHandler;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.exception.OutOfIndexException;
+import com.thoughtworks.rslist.service.RsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,64 +35,34 @@ public class RsController {
   @Autowired
   private UserRepository userRepository;
 
+  @Autowired
+  private RsService rsService;
+
   @GetMapping("rs/list")
-  public ResponseEntity getAllInList(@RequestParam(required = false) Integer pageSize,
+  public List<RsEventDTO> getAllInList(@RequestParam(required = false) Integer pageSize,
                                      @RequestParam(required = false) Integer pageIndex) {
-    List<RsEventDTO> resultList;
-
-    if (pageSize != null&& pageIndex != null) {
-      Pageable page = PageRequest.of(pageIndex - 1, pageSize);
-      resultList = rsEventRepository.findAll(page)
-              .stream()
-              .map(f -> RsEventDTO.fromEntity(f))
-              .collect(Collectors.toList());
-      return ResponseEntity.status(HttpStatus.OK).body(resultList);
-    }
-    resultList = rsEventRepository.findAll()
-            .stream()
-            .map(f -> RsEventDTO.fromEntity(f))
-            .collect(Collectors.toList());
-
-    return ResponseEntity.status(HttpStatus.OK).body(resultList);
+      return rsService.findAllRsEvent(pageIndex, pageSize);
   }
 
   @GetMapping("rs/{id}")
-  public ResponseEntity getOneById(@PathVariable int id) throws OutOfIndexException {
-    if (!rsEventRepository.existsById(id)) {
-      throw new OutOfIndexException("invalid id");
-    }
-    RsEventEntity result = rsEventRepository.findById(id).get();
-    return ResponseEntity.status(HttpStatus.OK).body(RsEventDTO.fromEntity(result));
+  public RsEventDTO getOneById(@PathVariable int id) throws OutOfIndexException {
+    return rsService.getOneRsEventById(id);
   }
 
   @PostMapping("rs/item")
   public ResponseEntity addOne(@RequestBody @Valid RsEventEntity newEvent) throws ContentEmptyException {
-    isNull(newEvent, "requestBody is null");
-    if (userRepository.existsById(newEvent.getUserId())) {
-      rsEventRepository.save(newEvent);
-    } else {
-      throw new ContentEmptyException("invalid user to add rsEvent");
-    }
+    rsService.createRsEvent(newEvent);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @PutMapping("rs/item")
-  @Transactional
-  public ResponseEntity replaceOneById(@RequestBody @Valid RsEventDTO rsEventDTO) {
-    isNull(rsEventDTO, "requestBody is null");
-
-    if (!userRepository.existsById(rsEventDTO.getUserId())) {
-      throw new RuntimeException("this user has not been registered");
-    }
-
-    rsEventRepository.updateRsEventEntityById(rsEventDTO.toEntity());
-    return ResponseEntity.status(HttpStatus.OK).build();
+  public void replaceOneById(@RequestBody @Valid RsEventDTO rsEventDTO) {
+    rsService.updateRsEvent(rsEventDTO);
   }
 
   @DeleteMapping("rs/item/{id}")
-  public ResponseEntity deleteOneById(@PathVariable int id) {
-    rsEventRepository.deleteById(id);
-    return ResponseEntity.status(HttpStatus.OK).build();
+  public void deleteOneById(@PathVariable int id) {
+    rsService.deleteRsEvent(id);
   }
 
   @Transactional
@@ -99,16 +70,7 @@ public class RsController {
   public ResponseEntity patchOneEvent(@PathVariable @NotNull int rsEventId,
                                       @RequestParam String eventName,
                                       @RequestParam String keyWord) {
-    if (rsEventRepository.existsById(rsEventId)) {
-
-      if (strIsBlank(eventName)) {
-        rsEventRepository.updateEventNameById(rsEventId, eventName);
-      }
-
-      if (strIsBlank(keyWord)) {
-        rsEventRepository.updateKeyWordById(rsEventId, keyWord);
-      }
-
+    if (rsService.updatePartProperty(rsEventId, eventName, keyWord)) {
       return ResponseEntity.status(HttpStatus.OK).build();
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
