@@ -1,27 +1,18 @@
 package com.thoughtworks.rslist.api;
 
 import com.thoughtworks.rslist.DTO.RsEventDTO;
-import com.thoughtworks.rslist.domain.RsEvent;
-import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.entity.RsEventEntity;
-import com.thoughtworks.rslist.entity.UserEntity;
 import com.thoughtworks.rslist.exception.ContentEmptyException;
 import com.thoughtworks.rslist.exception.GlobalExceptionHandler;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
-import com.thoughtworks.rslist.validation.PatchForRsEventValidation;
-import com.thoughtworks.rslist.validation.ValidationGroup;
-import com.thoughtworks.rslist.exception.CommonError;
 import com.thoughtworks.rslist.exception.OutOfIndexException;
 import lombok.extern.slf4j.Slf4j;
-import lombok.extern.slf4j.XSlf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,9 +20,7 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.thoughtworks.rslist.utils.Utils.*;
 

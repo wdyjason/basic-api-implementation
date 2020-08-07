@@ -1,40 +1,24 @@
 package com.thoughtworks.rslist.api;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thoughtworks.rslist.DTO.RsEventDTO;
-import com.thoughtworks.rslist.domain.RsEvent;
-import com.thoughtworks.rslist.domain.User;
+
 import com.thoughtworks.rslist.entity.RsEventEntity;
 import com.thoughtworks.rslist.entity.UserEntity;
 import com.thoughtworks.rslist.entity.VoteEntity;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.omg.CORBA.Object;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.web.JsonPath;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -64,9 +48,6 @@ class RsControllerTest {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     private LocalDateTime testTime = LocalDateTime.now();
-    private User oldUser =
-            new User("oldUser", 20, "male", "a@qq.com", "18888888888");
-
 
     private UserEntity initialUserEntity = UserEntity.builder()
             .age(20)
@@ -191,28 +172,6 @@ class RsControllerTest {
                 .andExpect(status().isOk());
     }
 
-//    @Test
-//    public void should_add_user_successful_when_post_new_user() throws Exception {
-////        User newUser =
-////                new User("newUser", 20, "male", "a@qq.com", "18888888888");
-////        RsEvent postEvent = new RsEvent("修改的事件", "未分类", newUser);
-////        ObjectMapper objectMapper = new ObjectMapper();
-//        String eventStr = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
-//                "\"user\":1}";
-//        mockMvc.perform(post("/rs/item").content(eventStr).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(content().string("index: 2"))
-//                .andExpect(status().isCreated());
-////        assertEquals(newUser.toString(), UserController.userList.get(1).toString());
-//    }
-
-//    @Test
-//    public void user_name_max_size_is_8_when_post_event() throws Exception {
-//        String oldUserNameMoreThan8 = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
-//                "\"user\":{\"userName\":\"oldUserHhh\",\"age\":20,\"gender\":\"male\",\"email\":\"a@qq.com\",\"phone\":\"18888888888\"}}";
-//        mockMvc.perform(post("/rs/item").content(oldUserNameMoreThan8).contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isBadRequest());
-//    }
-
     @Test
     public void  user_age_should_between_18_and_100_when_post_event() throws Exception {
         String oldUserAge101 = "{\"eventName\":\"修改的事件\",\"keyWord\":\"未分类\"," +
@@ -249,13 +208,6 @@ class RsControllerTest {
         mockMvc.perform(post("/rs/item").content(oldUserPhoneWrong).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
-
-//    @Test
-//    public void should_throw_exception_when_index_pout_of_bounds() throws Exception {
-//        mockMvc.perform(get("/rs/list/?startIndex=1&endIndex=5"))
-//                .andExpect(content().string("{\"error\":\"invalid request param\"}"))
-//                .andExpect(status().isBadRequest());
-//    }
 
     @Test
     public void should_throw_invalid_id_when_index_pout_of_bounds() throws Exception {
