@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @Builder
@@ -19,16 +20,22 @@ public class UserEntity {
 
     @Id
     @GeneratedValue
-    Integer id;
+    private Integer id;
 
     @Column(name = "name")
-    String userName;
+    @NotNull
+    private String userName;
 
-    Integer age;
+    private Integer age;
 
-    String gender;
+    private String gender;
 
-    String email;
+    private String email;
 
-    String phone;
+    private String phone;
+
+    private Integer tickets;
+
+    @OneToMany(cascade = {CascadeType.REMOVE}, mappedBy = "userId")
+    List<RsEventEntity> rsEventEntityList;
 }
