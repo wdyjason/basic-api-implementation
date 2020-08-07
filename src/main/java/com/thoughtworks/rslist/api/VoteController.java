@@ -36,7 +36,7 @@ public class VoteController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("/rs/vote/history")
+    @GetMapping("/rs/history/vote")
     public List<VoteEntity> getList(@RequestParam String startTime, @RequestParam String endTime) {
 
         return voteRepository.findByVoteTimeBetween(LocalDateTime.parse(startTime), LocalDateTime.parse(endTime));

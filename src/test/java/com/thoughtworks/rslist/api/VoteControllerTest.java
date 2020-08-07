@@ -84,7 +84,7 @@ class VoteControllerTest {
                 .build();
         voteRepository.saveAll(Arrays.asList(vote1st, vote2nd, vote3rd));
 
-        mockMvc.perform(get("/rs/vote/history?startTime=2020-01-06T11:30:59&endTime=2020-01-07T20:30:59"))
+        mockMvc.perform(get("/rs/history/vote?startTime=2020-01-06T11:30:59&endTime=2020-01-07T20:30:59"))
                 .andExpect(jsonPath("$[0].voteNum").value(2))
                 .andExpect(jsonPath("$[0].userId").value(2))
                 .andExpect(status().isOk());
