@@ -31,4 +31,8 @@ public class RsEventEntity {
     @NotNull(groups = PatchForRsEventValidation.class)
     private Integer userId;
 
+    @OneToMany
+    @JoinColumn(name = "rsEventEntityId", updatable = true)
+    private List<VoteEntity> voteEntities;
+
 }

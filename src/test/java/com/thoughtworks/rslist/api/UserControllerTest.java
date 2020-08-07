@@ -163,8 +163,8 @@ class UserControllerTest {
                 .age(20)
                 .build());
 
-        rsEventRepository.saveAll(Arrays.asList(new RsEventEntity(1, "nameA", "kWordA", 1),
-                                                new RsEventEntity(2, "nameB", "kWordB",1)));
+        rsEventRepository.saveAll(Arrays.asList(new RsEventEntity(1, "nameA", "kWordA", 1, null),
+                                                new RsEventEntity(2, "nameB", "kWordB",1, null)));
 
         mockMvc.perform(delete("/user/1").content(oldUserStr).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

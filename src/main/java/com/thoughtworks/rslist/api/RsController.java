@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.api;
 
+import com.thoughtworks.rslist.DTO.RsEventDTO;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.entity.RsEventEntity;
@@ -15,6 +16,9 @@ import com.thoughtworks.rslist.exception.OutOfIndexException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.extern.slf4j.XSlf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -35,13 +39,6 @@ import static com.thoughtworks.rslist.utils.Utils.*;
 @Slf4j
 @RestController
 public class RsController {
-  private static User oldUser =
-          new User("oldUser", 20, "male", "a@qq.com", "18888888888");
-
-  public static List<RsEvent> rsList = Stream.of(new RsEvent("第一条事件", "经济", oldUser),
-          new RsEvent("第二条事件", "文化", oldUser),
-          new RsEvent("第三条事件", "政治", oldUser))
-          .collect(Collectors.toList());
 
   @Autowired
   private RsEventRepository rsEventRepository;
@@ -50,21 +47,33 @@ public class RsController {
   private UserRepository userRepository;
 
   @GetMapping("rs/list")
-  public ResponseEntity getAllInList(@RequestParam(required = false) Integer startIndex,
-                                     @RequestParam(required = false) Integer endIndex) throws OutOfIndexException {
-    if (startIndex == null || endIndex == null) return ResponseEntity.status(HttpStatus.OK).body(rsList);
-    if (startIndex < 0 || endIndex > rsList.size()) {
-      throw new OutOfIndexException("invalid request param");
+  public ResponseEntity getAllInList(@RequestParam(required = false) Integer pageSize,
+                                     @RequestParam(required = false) Integer pageIndex) {
+    List<RsEventDTO> resultList;
+
+    if (pageSize != null&& pageIndex != null) {
+      Pageable page = PageRequest.of(pageIndex - 1, pageSize);
+      resultList = rsEventRepository.findAll(page)
+              .stream()
+              .map(f -> RsEventDTO.fromEntity(f))
+              .collect(Collectors.toList());
+      return ResponseEntity.status(HttpStatus.OK).body(resultList);
     }
-    return ResponseEntity.status(HttpStatus.OK).body(rsList.subList(startIndex - 1, endIndex));
+    resultList = rsEventRepository.findAll()
+            .stream()
+            .map(f -> RsEventDTO.fromEntity(f))
+            .collect(Collectors.toList());
+
+    return ResponseEntity.status(HttpStatus.OK).body(resultList);
   }
 
   @GetMapping("rs/{id}")
   public ResponseEntity getOneById(@PathVariable int id) throws OutOfIndexException {
-    if (id < 0 || id >= rsList.size()) {
-      throw new OutOfIndexException("invalid index");
+    if (!rsEventRepository.existsById(id)) {
+      throw new OutOfIndexException("invalid id");
     }
-    return ResponseEntity.status(HttpStatus.OK).body(rsList.get(id - 1));
+    RsEventEntity result = rsEventRepository.findById(id).get();
+    return ResponseEntity.status(HttpStatus.OK).body(RsEventDTO.fromEntity(result));
   }
 
   @PostMapping("rs/item")
@@ -75,41 +84,42 @@ public class RsController {
     } else {
       throw new ContentEmptyException("invalid user to add rsEvent");
     }
-    return ResponseEntity.status(HttpStatus.CREATED).body("index: " + (rsList.size() - 1));
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PutMapping("rs/item/{id}")
-  public ResponseEntity replaceOneById(@PathVariable int id, @RequestBody RsEvent rsEvent) {
-    isNull(rsEvent, "requestBody is null");
-    String newEventName = rsEvent.getEventName();
-    String newKeyWord = rsEvent.getKeyWord();
-    if (strIsBlank(newEventName)) {
-      rsList.get(id - 1).setEventName(newEventName);
+  @PutMapping("rs/item")
+  @Transactional
+  public ResponseEntity replaceOneById(@RequestBody @Valid RsEventDTO rsEventDTO) {
+    isNull(rsEventDTO, "requestBody is null");
+
+    if (!userRepository.existsById(rsEventDTO.getUserId())) {
+      throw new RuntimeException("this user has not been registered");
     }
-    if (strIsBlank(newKeyWord)) {
-      rsList.get(id - 1).setKeyWord(newKeyWord);
-    }
-    return ResponseEntity.status(HttpStatus.OK).body(null);
+
+    rsEventRepository.updateRsEventEntityById(rsEventDTO.toEntity());
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @DeleteMapping("rs/item/{id}")
   public ResponseEntity deleteOneById(@PathVariable int id) {
-    rsList.remove(rsList.get(id - 1));
-    return ResponseEntity.status(HttpStatus.OK).body(null);
+    rsEventRepository.deleteById(id);
+    return ResponseEntity.status(HttpStatus.OK).build();
   }
 
   @Transactional
   @PatchMapping("rs/{rsEventId}")
   public ResponseEntity patchOneEvent(@PathVariable @NotNull int rsEventId,
-                            @RequestBody @Validated({PatchForRsEventValidation.class}) RsEventEntity rsEvent) {
-    Optional<RsEventEntity> rsEventWarp = rsEventRepository.findById(rsEventId);
-    if (rsEventWarp.isPresent() && rsEventWarp.get().getUserId() == rsEvent.getUserId()) {
+                                      @RequestParam String eventName,
+                                      @RequestParam String keyWord) {
+    if (rsEventRepository.existsById(rsEventId)) {
 
-      if (rsEvent.getEventName() != null)
-        rsEventRepository.updateEventNameById(rsEventId, rsEvent.getEventName());
+      if (strIsBlank(eventName)) {
+        rsEventRepository.updateEventNameById(rsEventId, eventName);
+      }
 
-      if (rsEvent.getKeyWord() != null)
-        rsEventRepository.updateKeyWordById(rsEventId, rsEvent.getKeyWord());
+      if (strIsBlank(keyWord)) {
+        rsEventRepository.updateKeyWordById(rsEventId, keyWord);
+      }
 
       return ResponseEntity.status(HttpStatus.OK).build();
     }
