@@ -26,7 +26,7 @@ public class RsEventEntity {
     private String eventName;
 
     @NotNull
-    private String keyWord;
+    private String keyword;
 
     @NotNull(groups = PatchForRsEventValidation.class)
     private Integer userId;

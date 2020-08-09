@@ -19,7 +19,7 @@ public class RsEvent {
     private String eventName;
 
     @NotNull(groups = FirstValidation.class)
-    private String keyWord;
+    private String keyword;
 
     @NotNull(groups = FirstValidation.class)
     @Valid

@@ -106,7 +106,7 @@ public class RsController {
       }
 
       if (strIsBlank(keyWord)) {
-        rsEventRepository.updateKeyWordById(rsEventId, keyWord);
+        rsEventRepository.updateKeywordById(rsEventId, keyWord);
       }
 
       return ResponseEntity.status(HttpStatus.OK).build();

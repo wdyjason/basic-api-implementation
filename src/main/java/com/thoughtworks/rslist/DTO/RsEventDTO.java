@@ -21,7 +21,7 @@ public class RsEventDTO {
 
     private String eventName;
 
-    private String keyWord;
+    private String keyword;
 
     private Integer voteNum;
 
@@ -35,7 +35,7 @@ public class RsEventDTO {
         return RsEventDTO.builder()
                 .id(entity.getId())
                 .eventName(entity.getEventName())
-                .keyWord(entity.getKeyWord())
+                .keyword(entity.getKeyword())
                 .voteNum(sumVote)
                 .build();
     }
@@ -54,7 +54,7 @@ public class RsEventDTO {
                 .id(id)
                 .userId(userId)
                 .eventName(eventName)
-                .keyWord(keyWord)
+                .keyword(keyword)
                 .build();
     }
 }
