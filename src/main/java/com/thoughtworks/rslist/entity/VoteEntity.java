@@ -25,6 +25,6 @@ public class VoteEntity {
 
     private Integer userId;
 
-    private Integer RsEventEntityId;
+    private Integer rsEventEntityId;
 
 }

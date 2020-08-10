@@ -1,16 +1,14 @@
 package com.thoughtworks.rslist.service;
 
-import com.thoughtworks.rslist.DTO.RsEventDTO;
+import com.thoughtworks.rslist.dto.RsEventDto;
 import com.thoughtworks.rslist.entity.RsEventEntity;
 import com.thoughtworks.rslist.exception.ContentEmptyException;
 import com.thoughtworks.rslist.exception.OutOfIndexException;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -32,26 +30,26 @@ public class RsService {
     }
 
 
-    public List<RsEventDTO> findAllRsEvent(Integer pageIndex, Integer pageSize) {
+    public List<RsEventDto> findAllRsEvent(Integer pageIndex, Integer pageSize) {
 
         if (pageIndex != null && pageSize != null) {
             Pageable page = PageRequest.of(pageIndex - 1, pageSize);
             return rsEventRepository.findAll(page)
                     .stream()
-                    .map(RsEventDTO::fromEntity)
+                    .map(RsEventDto::fromEntity)
                     .collect(Collectors.toList());
         }
         return rsEventRepository.findAll()
                 .stream()
-                .map(RsEventDTO::fromEntity)
+                .map(RsEventDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    public RsEventDTO getOneRsEventById(int id) throws OutOfIndexException {
+    public RsEventDto getOneRsEventById(int id) throws OutOfIndexException {
         if (!rsEventRepository.existsById(id)) {
             throw new OutOfIndexException("invalid id");
         }
-        return RsEventDTO.fromEntity(rsEventRepository.findById(id).get());
+        return RsEventDto.fromEntity(rsEventRepository.findById(id).get());
     }
 
     public void createRsEvent(RsEventEntity newEvent) throws ContentEmptyException {
@@ -63,7 +61,7 @@ public class RsService {
     }
 
     @Transactional
-    public void updateRsEvent(RsEventDTO rsEventDTO) {
+    public void updateRsEvent(RsEventDto rsEventDTO) {
         if (!userRepository.existsById(rsEventDTO.getUserId())) {
             throw new RuntimeException("this user has not been registered");
         }
@@ -75,15 +73,15 @@ public class RsService {
     }
 
     @Transactional
-    public boolean updatePartProperty(int id, String eventName, String keyWord) {
+    public boolean updatePartProperty(int id, String eventName, String keyword) {
         if (rsEventRepository.existsById(id)) {
 
             if (strIsBlank(eventName)) {
                 rsEventRepository.updateEventNameById(id, eventName);
             }
 
-            if (strIsBlank(keyWord)) {
-                rsEventRepository.updateKeyWordById(id, keyWord);
+            if (strIsBlank(keyword)) {
+                rsEventRepository.updateKeywordById(id, keyword);
             }
             return true;
         }

@@ -1,4 +1,4 @@
-package com.thoughtworks.rslist.DTO;
+package com.thoughtworks.rslist.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RsEventDTO {
+public class RsEventDto {
 
     @NotNull
     private Integer id;
@@ -27,12 +27,12 @@ public class RsEventDTO {
 
     private Integer userId;
 
-    public static RsEventDTO fromEntity(RsEventEntity entity) {
+    public static RsEventDto fromEntity(RsEventEntity entity) {
         int sumVote = 0;
         if (entity.getVoteEntities() != null && entity.getVoteEntities().size() > 0) {
             sumVote = entity.getVoteEntities().stream().map(f -> f.getVoteNum()).mapToInt(v -> v).sum();
         }
-        return RsEventDTO.builder()
+        return RsEventDto.builder()
                 .id(entity.getId())
                 .eventName(entity.getEventName())
                 .keyword(entity.getKeyword())
