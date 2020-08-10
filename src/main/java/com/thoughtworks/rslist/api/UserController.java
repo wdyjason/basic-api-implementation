@@ -1,60 +1,51 @@
 package com.thoughtworks.rslist.api;
 
-import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.dto.UserDto;
+import com.thoughtworks.rslist.service.UserService;
 
 import com.thoughtworks.rslist.exception.ContentEmptyException;
 import com.thoughtworks.rslist.exception.GlobalExceptionHandler;
 import com.thoughtworks.rslist.exception.OutOfIndexException;
-import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.validation.ValidationGroup;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
 public class UserController {
 
-    private UserRepository userRepository;
+    private UserService userService;
 
-    public UserController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping("/user")
-    public ResponseEntity registerUser(@RequestBody @Validated(ValidationGroup.class) User user) {
-        userRepository.save(user.toEntity());
+    public ResponseEntity registerUser(@RequestBody @Validated(ValidationGroup.class) UserDto userDto) {
+        userService.createAUser(userDto.toEntity());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/users")
-    public List<User> getUsers() {
-        return userRepository.findAll().stream().map(f -> User.formUserEntity(f)).collect(Collectors.toList());
+    public List<UserDto> getUsers() {
+        return userService.getAllUsers();
     }
 
     @GetMapping("/user/{id}")
-    public User getUserById(@PathVariable Integer id) throws OutOfIndexException, ContentEmptyException {
-        if (id == null) throw new OutOfIndexException("invalid id");
-
-         if (!userRepository.existsById(id)) throw new ContentEmptyException("not find user");
-
-        return User.formUserEntity(userRepository.findById(id).get());
+    public UserDto getUserById(@PathVariable Integer id) throws OutOfIndexException, ContentEmptyException {
+        return userService.getUserById(id);
     }
 
     @DeleteMapping("user/{id}")
-    @Transactional
     public void deleteOneById(@PathVariable Integer id) throws OutOfIndexException {
-        if (id == null) throw new OutOfIndexException("invalid id");
-
-        userRepository.deleteById(id);
+        userService.deleteUserById(id);
     }
 
     @ExceptionHandler({OutOfIndexException.class, MethodArgumentNotValidException.class, ContentEmptyException.class})
