@@ -17,13 +17,15 @@ import java.util.Optional;
 @RestController
 public class VoteController {
 
-    @Autowired
     UserRepository userRepository;
-
-    @Autowired
     VoteRepository voteRepository;
 
-    @PostMapping("/rs/{rsEventId}/vote")
+    public VoteController(UserRepository userRepository, VoteRepository voteRepository) {
+        this.userRepository = userRepository;
+        this.voteRepository = voteRepository;
+    }
+
+    @PostMapping("/rs/vote/{rsEventId}")
     public ResponseEntity voteForEvent(@PathVariable Integer rsEventId,
                                        @RequestBody VoteEntity voteEntity) throws ContentEmptyException {
         Optional<UserEntity> voteUserWarp = userRepository.findById(voteEntity.getUserId());
@@ -36,7 +38,7 @@ public class VoteController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("/rs/history/vote")
+    @GetMapping("/rs/vote/history")
     public List<VoteEntity> getList(@RequestParam String startTime, @RequestParam String endTime) {
 
         return voteRepository.findByVoteTimeBetween(LocalDateTime.parse(startTime), LocalDateTime.parse(endTime));
